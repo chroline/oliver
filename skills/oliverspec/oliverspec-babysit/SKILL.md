@@ -76,7 +76,7 @@ For every PR that needs work:
 
 1. **Comments / review threads** — address valid change requests and bug reports; push fixes on the PR’s Linear/Graphite branch (`gt modify` / commit + `gt submit --no-edit`). Reply on threads when you disagree or need clarification; resolve threads when fixed.
 2. **CI failures** — fix failures caused by this PR’s scope. Never gut or skip CI workflows just to go green. If a failure looks unrelated and the branch is behind its Graphite parent/trunk, restack (`gt restack`) / merge latest parent and re-run. Prefer scoped fixes; use `restack-conflict-resolution` when restacks conflict.
-3. Prefer **parallel sub-agents** (1 PR → 1 agent) when multiple PRs need fixes in the same round — same aggression as apply, without collapsing the whole stack into one agent unless justified.
+3. Prefer **parallel sub-agents** (1 PR → 1 agent → 1 worktree) when multiple PRs need fixes in the same round — same aggression as apply, without collapsing the whole stack into one agent unless justified. Use `best-of-n-runner` or `git worktree add` so agents don’t share a checkout.
 
 Bugbot / bot comments: validate before acting; skip noise; explain when declining.
 
@@ -131,6 +131,6 @@ Stop the loop and report when:
 - Wait for **real CI** to finish; fix failures; don’t fake green
 - Don’t merge PRs unless the user explicitly asks
 - Prefer Graphite (`gt submit`, `gt restack`) to keep the stack intact
-- Prefer parallel per-PR sub-agents when multiple PRs need work
+- Prefer parallel per-PR sub-agents when multiple PRs need work, each in its own git worktree
 - Don’t rewrite CI workflows solely to pass
 - Keep Linear links/status sensible if you touch issues (optional: leave tickets In Review)
