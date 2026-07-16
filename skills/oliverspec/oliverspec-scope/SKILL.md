@@ -62,6 +62,7 @@ Principles for slicing:
 - **"Flip the switch" last** — enforcement/gating after supporting flow
 - Parallel where possible — call out tickets that don't block each other
 - Every ticket gets **testable acceptance criteria**
+- **TDD by default** — tickets are implemented with test-driven development in `oliverspec-apply`. Scope each ticket so acceptance criteria demand **comprehensive tests** for a full implementation (happy path, edge cases, failure modes called out in the TRD). Thin “add a smoke test” ACs are not enough
 - **Stack-friendly slices** — `oliverspec-apply` opens one Graphite PR per ticket; avoid grab-bag tickets that fight restacks
 - Prefer TRD section boundaries as natural ticket seams when they map cleanly
 
@@ -88,9 +89,11 @@ For each confirmed ticket, `save_issue`:
 - <...>
 
 ## Acceptance Criteria
-- [ ] <observable, testable outcome>
+- [ ] <observable, testable product/behavior outcome>
 - [ ] <...>
-- [ ] <tests / verification expectation if relevant>
+- [ ] Tests written first (TDD): failing tests for the behavior above, then implementation
+- [ ] Comprehensive automated tests covering happy path, edge cases, and failure modes in scope
+- [ ] Relevant typecheck/lint/test commands pass for this ticket’s surface
 
 ## Dependencies
 <!-- Documentary only — you MUST also set Linear blockedBy/blocks relations -->
@@ -101,6 +104,7 @@ For each confirmed ticket, `save_issue`:
 <edge cases, out of scope for this ticket, implementation hints from TRD>
 ```
 
+Include concrete test expectations in ACs when the TRD names them (e.g. module, scenario, regression). Don’t leave testing as an optional afterthought.
 ### 4. Wire Linear relations (required)
 
 **Critical:** After create, every dependency edge must be applied with `save_issue` `blockedBy` and/or `blocks`. Mentioning blockers only in the description is not enough.
@@ -130,6 +134,7 @@ Summarize:
 - **Default team Engineering**
 - **Diagrams in Mermaid only**
 - **Every ticket must have acceptance criteria** as checkboxes
+- **TDD-ready tickets** — ACs must require comprehensive tests for a full implementation; apply will implement via TDD
 - **Explicit Linear blockers required** — `blockedBy` / `blocks` on every dependency edge
 - **Do not rewrite the PRD/TRD** except optional ticket index / links — design changes go back to `oliverspec-propose`
 - Do not start implementation in this skill

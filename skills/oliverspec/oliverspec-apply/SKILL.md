@@ -97,10 +97,11 @@ Each ticket agent receives a self-contained prompt including:
 - Base branch / Graphite parent: trunk for roots; otherwise the parent ticket’s Linear branch (downstack)
 - The Linear issue’s **git branch name** (from `get_issue` — required; do not invent a different name)
 - **Worktree path** (absolute) where all git/`gt`/file edits must happen — required; do not use the parent checkout
-- Required outputs: worktree path used, branch name used, Graphite PR URL, stack position (parent/children), summary of files changed, AC checklist result
+- Required outputs: worktree path used, branch name used, Graphite PR URL, stack position (parent/children), summary of files changed, AC checklist result, **test summary** (what was added/updated; commands run)
 
 **Branch naming:** use the Linear ticket’s git branch name exactly (returned by `get_issue`). Never invent `oliverspec/...` or other custom branch names.  
 **Worktrees:** one isolated worktree per ticket agent — no shared working directories across parallel agents.  
+**TDD required:** implement each ticket test-first. Tests must be comprehensive enough to lock a full implementation of that ticket’s scope (not a token smoke test).  
 **PR stacking:** Graphite only — create/submit with `gt`, not standalone `gh pr create` for stack members.  
 PR title: `<ISSUE-ID>: <ticket title>`  
 PR body must include:
@@ -116,10 +117,12 @@ PR body must include:
 - TRD: <url>
 
 ## Acceptance Criteria
-- [x] / [ ] copied from the ticket
+- [x] / [ ] copied from the ticket (including TDD / comprehensive test ACs)
 
 ## Test plan
-- [ ] ...
+- [ ] TDD: tests landed first (or in the same PR with clear red→green history)
+- [ ] Comprehensive coverage for this ticket’s scope (happy path, edges, failures)
+- [ ] <commands run, e.g. pnpm --filter … test>
 ```
 
 Agent responsibilities:
@@ -128,12 +131,12 @@ Agent responsibilities:
 2. `get_issue` for the ticket; create/checkout the issue’s Linear git branch via **Graphite** inside the worktree:
    - Root ticket (no `blockedBy`): `gt create <linear-branch-name>` from trunk (or ensure branch exists and is tracked in the stack)
    - Dependent ticket: stack on parent with `gt create <linear-branch-name> --onto <parent-linear-branch>` (branch name must match Linear)
-3. Implement until acceptance criteria are met (or clearly blocked)
-4. Run targeted tests/typechecks relevant to the change when practical
-5. Commit onto that branch (`gt modify -am "..."` or commit then ensure Graphite metadata is intact)
-6. Submit the stack with Graphite: `gt submit --no-edit` (use `--stack` / submit downstack as needed so parents exist on the remote). Do **not** use `gh pr create` for these PRs unless Graphite submit is unavailable — then say so explicitly
-7. Return PR URL + stack parent + worktree path + residual risks (parent removes the worktree unless you already did)
-
+3. **TDD — write tests first** for the acceptance criteria (failing/red), then implement until green. Expand tests until they comprehensively cover this ticket’s full scope: happy path, edge cases, and failure modes from the AC/TRD. Do not ship implementation with missing or token-only tests
+4. Implement until acceptance criteria are met (or clearly blocked), keeping tests as the source of truth for done
+5. Run the relevant automated tests (and typecheck/lint when practical) and fix failures before submit
+6. Commit onto that branch (`gt modify -am "..."` or commit then ensure Graphite metadata is intact). Prefer commit history that reflects red→green when practical (tests commit, then implementation), or one PR that clearly includes comprehensive tests
+7. Submit the stack with Graphite: `gt submit --no-edit` (use `--stack` / submit downstack as needed so parents exist on the remote). Do **not** use `gh pr create` for these PRs unless Graphite submit is unavailable — then say so explicitly
+8. Return PR URL + stack parent + worktree path + test summary + residual risks (parent removes the worktree unless you already did)
 Parent responsibilities:
 
 **On pickup (when dispatching an agent for a ticket):**
@@ -190,6 +193,7 @@ Loop until every in-scope ticket has a PR (or a hard blocker):
 - **No apply gate** — don't wait for review/merge to continue the project
 - **Mark In Progress on pickup** — set Linear state when work starts (before/as the sub-agent is dispatched), not only when the PR is opened
 - **One worktree per sub-agent** — parallel ticket agents never share a checkout; prefer `best-of-n-runner` or explicit `git worktree add`
+- **TDD required** — tests first; comprehensive automated tests for each ticket’s full scope before calling the PR done
 - **Parallel sub-agents by default** — parent only coordinates; prefer **1 ticket = 1 sub-agent**; each wave fans out N agents in one turn when N > 1; collapsing multiple tickets into one agent is highly discouraged (justify if you do). A single-ticket wave from real dependencies is fine
 - **Stack, don't stall** — dependent work is Graphite-upstack of parent branches
 - Keep changes scoped to each ticket's acceptance criteria
