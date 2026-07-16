@@ -1,0 +1,17 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "OliverSpec",
+      "description": "Linear-backed explore → propose → scope → apply → babysit workflow.",
+      "skills": [
+        "oliverspec-explore",
+        "oliverspec-propose",
+        "oliverspec-scope",
+        "oliverspec-apply",
+        "oliverspec-babysit"
+      ]
+    }
+  ]
+}
