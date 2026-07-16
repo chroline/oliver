@@ -1,6 +1,6 @@
 # OliverSpec
 
-Run Linear-backed changes the way I do: explore, propose, scope, apply, then babysit. OliverSpec mirrors OpenSpec’s shape without writing proposal files into the git repo.
+Run Linear-backed changes the way I do: explore, propose, scope, apply, then babysit. OliverSpec mirrors [OpenSpec](https://openspec.dev/)’s shape without writing proposal files into the git repo.
 
 I keep the plan in Linear (project, documents, tickets) and ship work as Graphite-stacked pull requests, one PR per ticket.
 
