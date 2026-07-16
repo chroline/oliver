@@ -55,25 +55,33 @@ Then **start immediately** — do not wait for per-ticket approval unless the us
 
 **Mapping rules:**
 - **1 ticket → 1 sub-agent** by default. Do not assign a whole wave (or multiple tickets) to a single sub-agent — that usually defeats the point of sub-agents
+- **1 ticket → 1 git worktree** — every ticket sub-agent must work in its **own** worktree (never the parent’s checkout). Parallel agents sharing one working tree cause overlapping dirty state and false conflicts
 - **1 wave → N sub-agents in parallel** where N = number of ready tickets in that wave. A wave is a dependency batching boundary, not a unit of work for one agent
-- Multiple waves over the session are expected. A wave may legitimately contain only one ticket when the graph has a single unlock (e.g. everything waits on one parent) — that is fine; still give that ticket its own agent, then fan out the next wave in parallel once it lands
+- Multiple waves over the session are expected. A wave may legitimately contain only one ticket when the graph has a single unlock (e.g. everything waits on one parent) — that is fine; still give that ticket its own agent **and** worktree, then fan out the next wave in parallel once it lands
 - Collapsing several tickets into one agent is **highly discouraged**, not banned — only do it when parallelism is clearly wasteful or harmful (e.g. unavoidable same-file thrash with no clean split), and say why
 
 1. Partition tickets into waves by dependencies (wave 1 = no blockers, wave 2 = blocked only by wave 1, etc.)
 2. **Before launching a wave:** for each ticket in the wave, mark it **In Progress** in Linear (`save_issue` with `state: "In Progress"` — or the team’s equivalent started state from `list_issue_statuses` if the name differs). Do this as soon as you pick the ticket up, before/as you dispatch its sub-agent — not after the PR exists
-3. **For every wave: launch one Task sub-agent per ticket, all in the same message** when N > 1 — true parallelism via multiple concurrent `Task` calls. Default bias: **max parallel fan-out** across that wave’s tickets
-4. Independent stacks/chains in the same wave all run concurrently (separate agents). For a linear chain `A blocks B`, B’s agent starts in the next wave as soon as A’s branch exists — still as **its own** agent unless you’ve explicitly justified collapsing
+3. **For every wave: launch one Task sub-agent per ticket, all in the same message** when N > 1 — true parallelism via multiple concurrent `Task` calls. Default bias: **max parallel fan-out** across that wave’s tickets. Prefer `subagent_type: "best-of-n-runner"` when available (isolated worktree built-in); otherwise `generalPurpose` / `shell` with an explicit worktree path the parent created
+4. Independent stacks/chains in the same wave all run concurrently (separate agents + separate worktrees). For a linear chain `A blocks B`, B’s agent starts in the next wave as soon as A’s branch exists — still as **its own** agent/worktree unless you’ve explicitly justified collapsing
 5. Do **not** pause for merge/review between waves. As soon as a wave’s agents finish (branches + stacked PRs exist), immediately launch the next wave’s parallel set of ticket agents (or the single unlocked ticket, then the wider fan-out after that)
 6. For dependent tickets, stack with Graphite on the parent ticket’s branch — `gt create <linear-branch-name> --onto <parent-linear-branch>` (or checkout parent then `gt create`), then `gt submit` — never wait for merge and never open a free-floating PR against trunk for a blocked ticket
-7. Parent agent coordinates only: set In Progress on pickup, dispatch the parallel Task batch per wave, Graphite restacks (`gt restack`) when parents move, conflict resolution (see restack-conflict-resolution skill), PR linking, Linear status updates — **parent does not implement ticket bodies by default**
+7. Parent agent coordinates only: set In Progress on pickup, create/assign worktrees, dispatch the parallel Task batch per wave, Graphite restacks (`gt restack`) when parents move, conflict resolution (see restack-conflict-resolution skill), PR linking, Linear status updates, worktree cleanup — **parent does not implement ticket bodies by default**
 
-Use `Task` with `subagent_type: generalPurpose` (or `shell` for narrow git/`gt` ops).
+**Worktrees (required for parallel apply):**
+- Parent (or each agent at start) creates a dedicated worktree per ticket, e.g. `git worktree add <repo>/.worktrees/<issue-id> -b <linear-branch-name> <base-ref>` (or `git worktree add … <existing-linear-branch>` when the branch already exists)
+- Put worktrees outside the main checkout’s dirty path (commonly `<repo>/.worktrees/…` or a sibling directory). Add `.worktrees/` to local ignore if needed; don’t commit worktree contents
+- Each agent’s cwd **must** be its worktree. Never `cd` back to the parent checkout to edit application files
+- After PR submit (or on failure), remove the worktree: `git worktree remove <path>` (parent may batch-clean)
+
+Use `Task` with `subagent_type: "best-of-n-runner"` when the environment supports isolated worktrees; otherwise `generalPurpose` (or `shell` for narrow git/`gt` ops) **with the worktree path in the prompt**.
 
 **Discouraged (avoid unless justified):**
 - One sub-agent owning multiple tickets / an entire wave when those tickets could be separate agents
 - Implementing ticket bodies yourself instead of dispatching agents
 - Running same-wave ticket agents strictly sequentially “to be safe” when they could run in parallel
 - Waiting for one PR’s CI/review before launching the rest of a ready wave
+- Two agents editing the **same** worktree / checkout
 
 **Not an anti-pattern:** a wave with N=1 because the dependency graph only unlocked one ticket — run that one agent, then parallelize the following wave hard.
 
@@ -88,9 +96,11 @@ Each ticket agent receives a self-contained prompt including:
 - Repo constraints / pointers to touch points discovered by the parent
 - Base branch / Graphite parent: trunk for roots; otherwise the parent ticket’s Linear branch (downstack)
 - The Linear issue’s **git branch name** (from `get_issue` — required; do not invent a different name)
-- Required outputs: branch name used, Graphite PR URL, stack position (parent/children), summary of files changed, AC checklist result
+- **Worktree path** (absolute) where all git/`gt`/file edits must happen — required; do not use the parent checkout
+- Required outputs: worktree path used, branch name used, Graphite PR URL, stack position (parent/children), summary of files changed, AC checklist result
 
 **Branch naming:** use the Linear ticket’s git branch name exactly (returned by `get_issue`). Never invent `oliverspec/...` or other custom branch names.  
+**Worktrees:** one isolated worktree per ticket agent — no shared working directories across parallel agents.  
 **PR stacking:** Graphite only — create/submit with `gt`, not standalone `gh pr create` for stack members.  
 PR title: `<ISSUE-ID>: <ticket title>`  
 PR body must include:
@@ -114,25 +124,28 @@ PR body must include:
 
 Agent responsibilities:
 
-1. Confirm the issue is **In Progress** (if the parent hasn’t already: `save_issue` `id` + `state: "In Progress"`). Then `get_issue` for the ticket; create/checkout the issue’s Linear git branch via **Graphite**:
+1. Confirm the issue is **In Progress** (if the parent hasn’t already: `save_issue` `id` + `state: "In Progress"`). Enter the assigned **worktree** (create it if the parent didn’t: `git worktree add …` for the Linear branch / base). All subsequent commands run with cwd = that worktree
+2. `get_issue` for the ticket; create/checkout the issue’s Linear git branch via **Graphite** inside the worktree:
    - Root ticket (no `blockedBy`): `gt create <linear-branch-name>` from trunk (or ensure branch exists and is tracked in the stack)
    - Dependent ticket: stack on parent with `gt create <linear-branch-name> --onto <parent-linear-branch>` (branch name must match Linear)
-2. Implement until acceptance criteria are met (or clearly blocked)
-3. Run targeted tests/typechecks relevant to the change when practical
-4. Commit onto that branch (`gt modify -am "..."` or commit then ensure Graphite metadata is intact)
-5. Submit the stack with Graphite: `gt submit --no-edit` (use `--stack` / submit downstack as needed so parents exist on the remote). Do **not** use `gh pr create` for these PRs unless Graphite submit is unavailable — then say so explicitly
-6. Return PR URL + stack parent + residual risks
+3. Implement until acceptance criteria are met (or clearly blocked)
+4. Run targeted tests/typechecks relevant to the change when practical
+5. Commit onto that branch (`gt modify -am "..."` or commit then ensure Graphite metadata is intact)
+6. Submit the stack with Graphite: `gt submit --no-edit` (use `--stack` / submit downstack as needed so parents exist on the remote). Do **not** use `gh pr create` for these PRs unless Graphite submit is unavailable — then say so explicitly
+7. Return PR URL + stack parent + worktree path + residual risks (parent removes the worktree unless you already did)
 
 Parent responsibilities:
 
 **On pickup (when dispatching an agent for a ticket):**
 1. Mark the issue **In Progress** via `save_issue` (`state: "In Progress"` or team equivalent)
+2. Ensure a dedicated worktree exists (or instruct `best-of-n-runner` / the agent to create one) and pass its absolute path in the Task prompt
 
 **After each agent returns:**
 1. Attach PR to the Linear issue (`save_issue` `links: [{ url, title }]`)
 2. Move issue to an appropriate next state (e.g. In Review) if statuses allow
 3. `gt restack` / fix stack gaps if children were submitted before parents settled
-4. Record progress in the session summary
+4. `git worktree remove` (and prune) for that ticket’s worktree when safe
+5. Record progress in the session summary
 
 ### 4. Keep going until the project is done
 
@@ -176,6 +189,7 @@ Loop until every in-scope ticket has a PR (or a hard blocker):
 - **Branch names from Linear** — always use the issue’s git branch name from `get_issue`
 - **No apply gate** — don't wait for review/merge to continue the project
 - **Mark In Progress on pickup** — set Linear state when work starts (before/as the sub-agent is dispatched), not only when the PR is opened
+- **One worktree per sub-agent** — parallel ticket agents never share a checkout; prefer `best-of-n-runner` or explicit `git worktree add`
 - **Parallel sub-agents by default** — parent only coordinates; prefer **1 ticket = 1 sub-agent**; each wave fans out N agents in one turn when N > 1; collapsing multiple tickets into one agent is highly discouraged (justify if you do). A single-ticket wave from real dependencies is fine
 - **Stack, don't stall** — dependent work is Graphite-upstack of parent branches
 - Keep changes scoped to each ticket's acceptance criteria

@@ -28,7 +28,7 @@ Each skill covers one stage of the workflow:
 | [`oliverspec-explore`](./oliverspec-explore/SKILL.md) | Think through the problem. Read code, draw diagrams, challenge assumptions. No implementation. No Linear writes unless you ask to capture. |
 | [`oliverspec-propose`](./oliverspec-propose/SKILL.md) | Create or update a Linear project with a product PRD and a deeply technical TRD. Does not create tickets. |
 | [`oliverspec-scope`](./oliverspec-scope/SKILL.md) | Turn the PRD and TRD into Linear tickets with acceptance criteria and explicit `blockedBy` / `blocks` relations. |
-| [`oliverspec-apply`](./oliverspec-apply/SKILL.md) | Implement the project in one session. Fan out parallel sub-agents (1 ticket → 1 agent), mark tickets In Progress, open one Graphite-stacked PR per ticket. |
+| [`oliverspec-apply`](./oliverspec-apply/SKILL.md) | Implement the project in one session. Fan out parallel sub-agents (1 ticket → 1 agent → 1 worktree), mark tickets In Progress, open one Graphite-stacked PR per ticket. |
 | [`oliverspec-babysit`](./oliverspec-babysit/SKILL.md) | Clear open PR comments and CI failures across the stack. Wait for real CI. Ignore Graphite mergeability. |
 
 ## How I write the PRD and TRD
@@ -50,7 +50,7 @@ These are the defaults unless you override them:
 | Persistence | Linear only. No `openspec/changes/` (or similar) in the repo |
 | Branch names | The Linear issue git branch name from `get_issue` |
 | PRs | Graphite stacks via `gt create` / `gt submit`, one PR per ticket |
-| Apply parallelism | Parallel `Task` sub-agents for every ready ticket in a wave |
+| Apply parallelism | Parallel `Task` sub-agents for every ready ticket in a wave, each in its own git worktree |
 
 ## What you need installed
 
