@@ -1,0 +1,26 @@
+{
+  "name": "oliver",
+  "owner": {
+    "name": "Cole Gawin",
+    "email": "cole@chroline.com"
+  },
+  "metadata": {
+    "description": "Oliver — personal agent skill suite",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "oliverspec",
+      "description": "Linear-backed explore → propose → scope → apply → babysit workflow",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/oliverspec/oliverspec-explore",
+        "./skills/oliverspec/oliverspec-propose",
+        "./skills/oliverspec/oliverspec-scope",
+        "./skills/oliverspec/oliverspec-apply",
+        "./skills/oliverspec/oliverspec-babysit"
+      ]
+    }
+  ]
+}
