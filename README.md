@@ -1,6 +1,6 @@
 # Oliver
 
-Personal agent skill suite — workflows Cole uses across projects.
+My personal agent skill suite — workflows I use across projects.
 
 Discoverable via [skills.sh](https://skills.sh/chroline/oliver) / [vercel-labs/skills](https://github.com/vercel-labs/skills).
 
@@ -12,7 +12,7 @@ Discoverable via [skills.sh](https://skills.sh/chroline/oliver) / [vercel-labs/s
 
 ## Install
 
-**One suite** (preferred as the repo grows):
+**One suite** (what I usually want as this repo grows):
 
 ```bash
 npx skills add chroline/oliver/skills/oliverspec
@@ -30,7 +30,7 @@ Browse: https://skills.sh/chroline/oliver
 
 ## Layout
 
-Suites live under `skills/<suite>/<skill>/SKILL.md` so each suite installs via a GitHub subpath without pulling every skill in the monorepo.
+I keep suites under `skills/<suite>/<skill>/SKILL.md` so I can install one suite via a GitHub subpath without pulling every skill I add later.
 
 ```
 skills/
