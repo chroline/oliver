@@ -1,61 +1,71 @@
 # OliverSpec
 
-My Linear-backed change workflow — OpenSpec-shaped (`explore` → `propose` → `scope` → `apply` → `babysit`), without dumping proposal artifacts into the git repo.
+Run Linear-backed changes the way I do: explore, propose, scope, apply, then babysit. OliverSpec mirrors OpenSpec’s shape without writing proposal files into the git repo.
 
-I keep the plan in **Linear** (project + documents + tickets) and ship implementation as **Graphite-stacked PRs**, one per ticket.
+I keep the plan in Linear (project, documents, tickets) and ship work as Graphite-stacked pull requests, one PR per ticket.
 
 ```mermaid
 flowchart LR
   explore --> propose --> scope --> apply --> babysit
 ```
 
-## Install
+## Install OliverSpec
+
+Install the full OliverSpec suite with:
 
 ```bash
 npx skills add chroline/oliver/skills/oliverspec
 ```
 
-This is part of my [Oliver](../../) skill suite. Browse on [skills.sh](https://skills.sh/chroline/oliver).
+OliverSpec is one suite inside [Oliver](../../). Browse it on [skills.sh/chroline/oliver](https://skills.sh/chroline/oliver).
 
-## Skills
+## Skills in the suite
 
-| Skill | What I use it for |
-|-------|-------------------|
-| [`oliverspec-explore`](./oliverspec-explore/SKILL.md) | Think through a problem — read code, diagram, challenge assumptions. No implementation, no Linear writes unless I ask to capture. |
-| [`oliverspec-propose`](./oliverspec-propose/SKILL.md) | Create/update a Linear project with a **PRD** (product voice) and a detailed **TRD** (deeply technical voice). No tickets yet. |
-| [`oliverspec-scope`](./oliverspec-scope/SKILL.md) | Break the PRD/TRD into Linear tickets with acceptance criteria and explicit `blockedBy` / `blocks` relations. |
-| [`oliverspec-apply`](./oliverspec-apply/SKILL.md) | Implement the whole project in one go — parallel sub-agents (1 ticket → 1 agent), mark tickets In Progress, one Graphite-stacked PR per ticket. |
-| [`oliverspec-babysit`](./oliverspec-babysit/SKILL.md) | Loop across the stack: fix PR comments + CI failures, wait for real CI. I ignore Graphite mergeability on purpose. |
+Each skill covers one stage of the workflow:
 
-## Document voices
+| Skill | What it does |
+|-------|----------------|
+| [`oliverspec-explore`](./oliverspec-explore/SKILL.md) | Think through the problem. Read code, draw diagrams, challenge assumptions. No implementation. No Linear writes unless you ask to capture. |
+| [`oliverspec-propose`](./oliverspec-propose/SKILL.md) | Create or update a Linear project with a product PRD and a deeply technical TRD. Does not create tickets. |
+| [`oliverspec-scope`](./oliverspec-scope/SKILL.md) | Turn the PRD and TRD into Linear tickets with acceptance criteria and explicit `blockedBy` / `blocks` relations. |
+| [`oliverspec-apply`](./oliverspec-apply/SKILL.md) | Implement the project in one session. Fan out parallel sub-agents (1 ticket → 1 agent), mark tickets In Progress, open one Graphite-stacked PR per ticket. |
+| [`oliverspec-babysit`](./oliverspec-babysit/SKILL.md) | Clear open PR comments and CI failures across the stack. Wait for real CI. Ignore Graphite mergeability. |
 
-I keep these voices strict so the docs stay useful:
+## How I write the PRD and TRD
 
-| Doc | Perspective | I put here | I keep out |
-|-----|-------------|------------|------------|
-| **PRD** | Product | Problem, users, outcomes, UX/behavior, success metrics | Schemas, APIs, file paths, infra choices |
-| **TRD** | Deeply technical | Architecture, data model, APIs, control flow, failure modes, rollout | Soft product copy, vague goals without a mechanism |
+I keep product and engineering voices separate so each doc stays useful:
 
-## Defaults
+| Doc | Voice | Put here | Keep out |
+|-----|-------|----------|----------|
+| **PRD** | Product | Problem, users, outcomes, UX behavior, success metrics | Schemas, APIs, file paths, infra choices |
+| **TRD** | Deeply technical | Architecture, data model, APIs, control flow, failure modes, rollout | Soft product copy, goals with no mechanism |
 
-| Setting | What I default to |
-|---------|-------------------|
-| Linear team | Engineering (unless I say otherwise) |
-| Persistence | Linear only — no `openspec/changes/` (or similar) in the repo |
-| Branch names | The Linear issue’s git branch name from `get_issue` |
-| PRs | Graphite stacks (`gt create` / `gt submit`) — one PR per ticket |
-| Apply parallelism | Fan out parallel `Task` sub-agents per ready wave |
+## Defaults I expect
 
-## Requirements
+These are the defaults unless you override them:
 
-- [Linear MCP](https://linear.app) — propose / scope / apply / babysit
-- [Graphite CLI](https://graphite.dev) `gt` — apply / babysit stacks
-- [GitHub CLI](https://cli.github.com) `gh` — babysit PR/CI inspection
+| Setting | Default |
+|---------|---------|
+| Linear team | Engineering |
+| Persistence | Linear only. No `openspec/changes/` (or similar) in the repo |
+| Branch names | The Linear issue git branch name from `get_issue` |
+| PRs | Graphite stacks via `gt create` / `gt submit`, one PR per ticket |
+| Apply parallelism | Parallel `Task` sub-agents for every ready ticket in a wave |
 
-## Typical flow
+## What you need installed
 
-1. **Explore** until I’m clear on the problem and approach  
-2. **Propose** → confirm PRD + TRD → write them to Linear  
-3. **Scope** → confirm ticket breakdown + Mermaid deps → create issues + wire relations  
-4. **Apply** → parallel agents open the Graphite stack  
-5. **Babysit** → comments + CI green across the stack  
+OliverSpec depends on these tools:
+
+- **Linear MCP**: propose, scope, apply, and babysit ([Linear](https://linear.app))
+- **Graphite CLI (`gt`)**: apply and babysit stacks ([Graphite](https://graphite.dev))
+- **GitHub CLI (`gh`)**: babysit PR and CI inspection ([GitHub CLI](https://cli.github.com))
+
+## Run a change end to end
+
+Work the stages in order:
+
+1. **Explore** until the problem and approach are clear
+2. **Propose**: confirm the PRD and TRD, then write them to Linear
+3. **Scope**: confirm the ticket breakdown and Mermaid dependency graph, then create issues and wire relations
+4. **Apply**: let parallel agents open the Graphite stack
+5. **Babysit**: clear comments and get real CI green across the stack
