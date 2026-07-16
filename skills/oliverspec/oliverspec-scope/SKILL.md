@@ -91,8 +91,9 @@ For each confirmed ticket, `save_issue`:
 ## Acceptance Criteria
 - [ ] <observable, testable product/behavior outcome>
 - [ ] <...>
-- [ ] Tests written first (TDD): failing tests for the behavior above, then implementation
-- [ ] Comprehensive automated tests covering happy path, edge cases, and failure modes in scope
+- [ ] Tests first (TDD): comprehensive failing tests for the behavior above
+- [ ] Typecheck stays green via stubs/fakes/interfaces while those tests are still red
+- [ ] Full implementation replaces stubs until tests pass
 - [ ] Relevant typecheck/lint/test commands pass for this ticket’s surface
 
 ## Dependencies
