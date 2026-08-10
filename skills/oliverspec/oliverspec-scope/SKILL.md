@@ -8,7 +8,7 @@ description: >
 license: MIT
 metadata:
   author: oliverspec
-  version: "1.0"
+  version: "1.1"
 ---
 
 **Scope** an OliverSpec **PRD + TRD** into Linear **tickets**. Never write proposal markdown into the git repo.
@@ -25,7 +25,7 @@ When scoped tickets are ready, run `oliverspec-apply`.
 |---------|---------|
 | Linear team | **Engineering** (override only if user specifies another team) |
 | Source of truth | Project **PRD** + **TRD** Linear documents |
-| PR stacking later | Graphite — slice tickets to be stack-friendly |
+| PR stacking later | GitHub stacked PRs (`gh stack`) — slice tickets to be stack-friendly |
 
 ---
 
@@ -57,13 +57,14 @@ From the PRD (**product** what/why) and TRD (**deeply technical** how), draft an
 
 Principles for slicing:
 
-- Each ticket is independently reviewable as its own Graphite-stacked PR
+- Each ticket is independently reviewable as its own stacked PR
 - Order by dependency — schema before logic, backend before frontend
 - **"Flip the switch" last** — enforcement/gating after supporting flow
 - Parallel where possible — call out tickets that don't block each other
 - Every ticket gets **testable acceptance criteria**
 - **TDD by default** — tickets are implemented with test-driven development in `oliverspec-apply`. Scope each ticket so acceptance criteria demand **comprehensive tests** for a full implementation (happy path, edge cases, failure modes called out in the TRD). Thin “add a smoke test” ACs are not enough
-- **Stack-friendly slices** — `oliverspec-apply` opens one Graphite PR per ticket; avoid grab-bag tickets that fight restacks
+- **Stack-friendly slices** — `oliverspec-apply` opens one stacked PR per ticket; avoid grab-bag tickets that fight rebases
+- **Prefer chains over diamonds** — a GitHub stack is a strictly linear chain, so a ticket with two independent `blockedBy` parents can only sit under one of them. Wire relations as chains where the real dependency allows it, and only use a second parent when the ticket genuinely needs both
 - Prefer TRD section boundaries as natural ticket seams when they map cleanly
 
 **Ask the user to confirm before creating anything in Linear.**
@@ -123,7 +124,7 @@ Summarize:
 
 - Project + PRD + TRD links
 - Ticket table: ID, title, blocked by, blocks, URL
-- Prompt: "Run `oliverspec-apply` (optionally with the project name) to implement — parallel sub-agents and one Graphite-stacked PR per ticket."
+- Prompt: "Run `oliverspec-apply` (optionally with the project name) to implement — parallel sub-agents and one stacked PR per ticket."
 
 ---
 
