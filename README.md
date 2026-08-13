@@ -49,5 +49,6 @@ skills/
     oliverspec-scope/
     oliverspec-apply/
     oliverspec-babysit/
+    oliverspec-ship/
   # future suites…
 ```
