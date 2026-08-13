@@ -22,6 +22,15 @@
         "./skills/oliverspec/oliverspec-babysit",
         "./skills/oliverspec/oliverspec-ship"
       ]
+    },
+    {
+      "name": "factory",
+      "description": "Autonomous single-ticket software factory — plan, critique, implement, stack PRs, babysit, merge on green-light",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/factory"
+      ]
     }
   ]
 }
