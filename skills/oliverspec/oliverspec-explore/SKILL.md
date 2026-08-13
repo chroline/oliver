@@ -4,7 +4,7 @@ description: Enter explore mode - a thinking partner for exploring ideas, invest
 license: MIT
 compatibility: Requires Linear MCP.
 metadata:
-  author: oliverspec
+  author: chroline
   version: "1.0"
 ---
 

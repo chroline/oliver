@@ -7,7 +7,7 @@ description: >
   oliverspec-scope. Does not write proposal docs to the git repo.
 license: MIT
 metadata:
-  author: oliverspec
+  author: chroline
   version: "1.2"
 ---
 

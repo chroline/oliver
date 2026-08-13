@@ -7,7 +7,7 @@ description: >
   oliverspec-ship after oliverspec-babysit has cleared the stack.
 license: MIT
 metadata:
-  author: oliverspec
+  author: chroline
   version: "1.0"
 ---
 

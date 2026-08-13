@@ -7,7 +7,7 @@ description: >
   oliverspec-apply for a Linear-proposed project.
 license: MIT
 metadata:
-  author: oliverspec
+  author: chroline
   version: "2.1"
 ---
 
