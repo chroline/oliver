@@ -71,8 +71,6 @@ Principles for slicing:
 
 ### 3. Create tickets
 
-Before creating tickets, set the Linear project status to **Planned** (`save_project` with `id` = the project and `state: "Planned"`, or the team's equivalent planned-stage state if the name differs) — this scope pass is what turns the project from an idea into a plan.
-
 For each confirmed ticket, `save_issue`:
 
 - `team`: Engineering (or override)
@@ -120,7 +118,11 @@ Include concrete test expectations in ACs when the TRD names them (e.g. module, 
 
 **Incomplete without relations:** If the Mermaid graph or description implies edges missing from Linear relations, this skill is not done — fix relations before handoff.
 
-### 5. Done — hand off
+### 5. Move project to Planned
+
+After tickets are created (and relations wired), set the Linear project status to **Planned** (`save_project` with `id` = the project and `state: "Planned"`, or the team's equivalent planned-stage state if the name differs). Do **not** move it earlier — Backlog/idea status stays until the ticket set actually exists. This scope pass is what turns the project from an idea into a plan.
+
+### 6. Done — hand off
 
 Summarize:
 
@@ -134,7 +136,7 @@ Summarize:
 ## Guardrails
 
 - **Read PRD + TRD first** — don't invent scope that isn't grounded in those docs
-- **Move the project to Planned** before/while creating tickets (`save_project` `state`) — don't leave it sitting in Backlog once a plan exists
+- **Move the project to Planned after tickets are created** (`save_project` `state`) — not before; don't leave it in Backlog once the ticket set exists
 - **No repo proposal artifacts**
 - **Confirm breakdown before creating** issues
 - **Default team Engineering**
