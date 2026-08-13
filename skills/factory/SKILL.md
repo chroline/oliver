@@ -6,6 +6,7 @@ description: >
   via sub-agent, open atomic stacked PRs, babysit CI/review until mergeable, then
   merge on user green-light. Use when the user wants /factory, factory, or to
   fully drive one Linear ticket from plan → PRs → merge.
+disable-model-invocation: true
 license: MIT
 metadata:
   author: factory
