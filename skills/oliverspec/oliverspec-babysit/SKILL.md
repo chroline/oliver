@@ -7,7 +7,7 @@ description: >
   babysit, or oliverspec-babysit after apply has opened the stack.
 license: MIT
 metadata:
-  author: oliverspec
+  author: chroline
   version: "2.1"
 ---
 

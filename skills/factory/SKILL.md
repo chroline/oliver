@@ -9,7 +9,7 @@ description: >
 disable-model-invocation: true
 license: MIT
 metadata:
-  author: factory
+  author: chroline
   version: "1.0"
 ---
 

@@ -8,7 +8,7 @@ description: >
   Linear PRD + TRD.
 license: MIT
 metadata:
-  author: oliverspec
+  author: chroline
   version: "1.0"
 ---
 
