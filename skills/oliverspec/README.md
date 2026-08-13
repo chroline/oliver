@@ -1,13 +1,15 @@
 # OliverSpec
 
-Run Linear-backed changes the way I do: explore, propose, scope, apply, then babysit. OliverSpec mirrors [OpenSpec](https://openspec.dev/)’s shape without writing proposal files into the git repo.
+Run Linear-backed changes the way I do: explore, propose, scope, apply, babysit, then ship. OliverSpec mirrors [OpenSpec](https://openspec.dev/)’s shape without writing proposal files into the git repo.
 
 I keep the plan in Linear (project, documents, tickets) and ship work as [GitHub stacked pull requests](https://docs.github.com/en/pull-requests/get-started/stacked-prs-quickstart), one PR per ticket.
 
 ```mermaid
 flowchart LR
-  explore --> propose --> scope --> apply --> babysit
+  explore --> propose --> scope --> apply --> babysit --> ship
 ```
+
+The Linear **project status** tracks the same flow: `scope` moves it to Planned, `apply` moves it to In Progress, `ship` moves it to Completed.
 
 ## Install OliverSpec
 
@@ -30,6 +32,7 @@ Each skill covers one stage of the workflow:
 | [`oliverspec-scope`](./oliverspec-scope/SKILL.md) | Turn the PRD and TRD into Linear tickets with acceptance criteria (including comprehensive TDD test expectations) and explicit `blockedBy` / `blocks` relations. |
 | [`oliverspec-apply`](./oliverspec-apply/SKILL.md) | Implement the project in one session via TDD (failing tests + typecheck-clean stubs, then implement backwards). Fan out parallel sub-agents (1 ticket → 1 agent → 1 worktree), mark tickets In Progress, open one stacked PR per ticket. |
 | [`oliverspec-babysit`](./oliverspec-babysit/SKILL.md) | Clear open PR comments and CI failures across the stack. Wait for real CI. Ignore stack merge-readiness gates. |
+| [`oliverspec-ship`](./oliverspec-ship/SKILL.md) | Merge the stack bottom-up with `gh stack merge` once it's clean, then move the Linear project to Completed. |
 
 ## How I write the PRD and TRD
 
@@ -68,6 +71,7 @@ Work the stages in order:
 
 1. **Explore** until the problem and approach are clear
 2. **Propose**: confirm the PRD and TRD, then write them to Linear
-3. **Scope**: confirm the ticket breakdown and Mermaid dependency graph, then create issues and wire relations
-4. **Apply**: let parallel agents open the stack
+3. **Scope**: confirm the ticket breakdown and Mermaid dependency graph, then create issues and wire relations (project → Planned)
+4. **Apply**: let parallel agents open the stack (project → In Progress)
 5. **Babysit**: clear comments and get real CI green across the stack
+6. **Ship**: merge the stack bottom-up and close out the project (project → Completed)

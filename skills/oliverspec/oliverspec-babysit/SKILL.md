@@ -8,7 +8,7 @@ description: >
 license: MIT
 metadata:
   author: oliverspec
-  version: "2.0"
+  version: "2.1"
 ---
 
 Babysit **every open PR** tied to an OliverSpec Linear project until the stack is clean.
@@ -130,6 +130,9 @@ Stop the loop and report when:
 ### Remaining non-blocking
 - Awaiting human review / merge (not babysit’s job)
 - Stack merge-readiness ignored by design
+
+### Suggested next step
+- Run `oliverspec-ship` to merge the stack and move the project to Completed
 ```
 
 ---
@@ -142,7 +145,7 @@ Stop the loop and report when:
 - **GitHub stacks, not Graphite** — `gh stack rebase` / `sync` / `push`, never `gt`
 - **Only the parent runs `gh stack`**, serially, from the main checkout with worktrees removed
 - Fix each problem in the layer it belongs to, then propagate with `gh stack rebase --upstack`
-- Don’t merge PRs unless the user explicitly asks. When asked, merge bottom-up with `gh stack merge` — a mid-stack PR always merges everything below it, and auto-merge is not supported for stacks
+- Don’t merge PRs — merging and moving the project to Completed is `oliverspec-ship`'s job, run after babysit is clean
 - Prefer parallel per-PR sub-agents when multiple PRs need work, each in its own git worktree outside the repo
 - Don’t rewrite CI workflows solely to pass
 - Keep Linear links/status sensible if you touch issues (optional: leave tickets In Review)
