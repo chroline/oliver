@@ -8,7 +8,7 @@ description: >
 license: MIT
 metadata:
   author: oliverspec
-  version: "1.1"
+  version: "1.2"
 ---
 
 **Scope** an OliverSpec **PRD + TRD** into Linear **tickets**. Never write proposal markdown into the git repo.
@@ -71,6 +71,8 @@ Principles for slicing:
 
 ### 3. Create tickets
 
+Before creating tickets, set the Linear project status to **Planned** (`save_project` with `id` = the project and `state: "Planned"`, or the team's equivalent planned-stage state if the name differs) — this scope pass is what turns the project from an idea into a plan.
+
 For each confirmed ticket, `save_issue`:
 
 - `team`: Engineering (or override)
@@ -123,6 +125,7 @@ Include concrete test expectations in ACs when the TRD names them (e.g. module, 
 Summarize:
 
 - Project + PRD + TRD links
+- Project status: **Planned**
 - Ticket table: ID, title, blocked by, blocks, URL
 - Prompt: "Run `oliverspec-apply` (optionally with the project name) to implement — parallel sub-agents and one stacked PR per ticket."
 
@@ -131,6 +134,7 @@ Summarize:
 ## Guardrails
 
 - **Read PRD + TRD first** — don't invent scope that isn't grounded in those docs
+- **Move the project to Planned** before/while creating tickets (`save_project` `state`) — don't leave it sitting in Backlog once a plan exists
 - **No repo proposal artifacts**
 - **Confirm breakdown before creating** issues
 - **Default team Engineering**

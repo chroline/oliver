@@ -8,7 +8,7 @@ description: >
 license: MIT
 metadata:
   author: oliverspec
-  version: "2.0"
+  version: "2.1"
 ---
 
 Implement an entire OliverSpec project from Linear in **one session**.
@@ -56,6 +56,7 @@ Optional but useful: `gh skill install github/gh-stack` to give agents the offic
 4. Load tickets (`list_issues` with `project`); for dependency edges use `get_issue` with `includeRelations: true`
 5. If there are no tickets, stop and tell the user to run `oliverspec-scope` (after `oliverspec-propose` if PRD/TRD are also missing)
 6. Build the dependency graph from Linear’s native `blockedBy` / `blocks` relations only — ignore dependency prose in descriptions if it conflicts; if relations are missing but the docs/graph imply them, stop and tell the user to re-run `oliverspec-scope` to wire relations
+7. Set the Linear project status to **In Progress** (`save_project` with `id` = the project and `state: "In Progress"`, or the team's equivalent started state if the name differs) if it isn't already — this happens once, up front, regardless of per-ticket states
 
 Show a short plan:
 
@@ -268,8 +269,7 @@ Loop until every in-scope ticket has a PR (or a hard blocker):
 
 ### Suggested next steps
 - Run `oliverspec-babysit` to clear PR comments + CI across the stack
-- Review the stack bottom-up; merge with `gh stack merge` (bottom-up, contiguous groups only — a mid-stack PR always merges everything below it)
-- `gh stack sync --prune` after merges to fast-forward trunk and rebase what's left
+- Then run `oliverspec-ship` to merge the stack and move the project to Completed
 - Re-run apply for any blocked tickets after resolving blockers
 ```
 
@@ -285,7 +285,8 @@ Loop until every in-scope ticket has a PR (or a hard blocker):
 - **Branch names from Linear** — always use the issue's git branch name from `get_issue`; the parent creates the branch with the worktree
 - **One worktree per sub-agent, outside the repo** — parallel ticket agents never share a checkout
 - **No apply gate** — don't wait for review/merge to continue the project
-- **Mark In Progress on pickup** — set Linear state when work starts (before/as the sub-agent is dispatched), not only when the PR is opened
+- **Move the project to In Progress** at the start of apply (`save_project` `state`), once — separate from per-ticket state
+- **Mark In Progress on pickup** — set Linear ticket state when work starts (before/as the sub-agent is dispatched), not only when the PR is opened
 - **TDD required** — (1) comprehensive failing tests, (2) stubs/fakes so typecheck passes while tests stay red, (3) implement backwards until green. No production-first shortcuts
 - **Parallel sub-agents by default** — parent only coordinates; prefer **1 ticket = 1 sub-agent**; each wave fans out N agents in one turn when N > 1; collapsing multiple tickets into one agent is highly discouraged (justify if you do). A single-ticket wave from real dependencies is fine
 - Keep changes scoped to each ticket's acceptance criteria

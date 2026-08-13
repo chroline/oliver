@@ -4,13 +4,14 @@
   "groupings": [
     {
       "title": "OliverSpec",
-      "description": "Linear-backed explore → propose → scope → apply → babysit. Install as a suite: npx skills add chroline/oliver/skills/oliverspec",
+      "description": "Linear-backed explore → propose → scope → apply → babysit → ship. Install as a suite: npx skills add chroline/oliver/skills/oliverspec",
       "skills": [
         "oliverspec-explore",
         "oliverspec-propose",
         "oliverspec-scope",
         "oliverspec-apply",
-        "oliverspec-babysit"
+        "oliverspec-babysit",
+        "oliverspec-ship"
       ]
     }
   ]
