@@ -13,6 +13,13 @@
         "oliverspec-babysit",
         "oliverspec-ship"
       ]
+    },
+    {
+      "title": "Factory",
+      "description": "Autonomous single Linear-ticket factory: plan → critique → implement → stack → babysit → merge on green-light. Install: npx skills add chroline/oliver/skills/factory",
+      "skills": [
+        "factory"
+      ]
     }
   ]
 }
