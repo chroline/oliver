@@ -11,7 +11,7 @@
   "plugins": [
     {
       "name": "oliverspec",
-      "description": "Linear-backed explore → propose → scope → apply → babysit workflow",
+      "description": "Linear-backed explore → propose → scope → apply → babysit → ship workflow",
       "source": "./",
       "strict": false,
       "skills": [
@@ -19,7 +19,17 @@
         "./skills/oliverspec/oliverspec-propose",
         "./skills/oliverspec/oliverspec-scope",
         "./skills/oliverspec/oliverspec-apply",
-        "./skills/oliverspec/oliverspec-babysit"
+        "./skills/oliverspec/oliverspec-babysit",
+        "./skills/oliverspec/oliverspec-ship"
+      ]
+    },
+    {
+      "name": "factory",
+      "description": "Autonomous single-ticket software factory — plan, critique, implement, stack PRs, babysit, merge on green-light",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/factory"
       ]
     }
   ]
