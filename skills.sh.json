@@ -20,6 +20,13 @@
       "skills": [
         "factory"
       ]
+    },
+    {
+      "title": "Babysit",
+      "description": "Watch open GitHub PRs / stacks until real CI is green and threads are clean. Install: npx skills add chroline/oliver/skills/babysit",
+      "skills": [
+        "babysit"
+      ]
     }
   ]
 }

@@ -12,6 +12,7 @@ I group skills into suites (or standalone skills) so you can install one workflo
 |---------|---------|------|
 | **OliverSpec** (suite) | `npx skills add chroline/oliver/skills/oliverspec` | [OliverSpec README](./skills/oliverspec/README.md) |
 | **Factory** (standalone) | `npx skills add chroline/oliver/skills/factory` | [Factory README](./skills/factory/README.md) |
+| **Babysit** (standalone) | `npx skills add chroline/oliver/skills/babysit` | [Babysit README](./skills/babysit/README.md) |
 
 ## Install a suite
 
@@ -25,6 +26,12 @@ Run this when you only want Factory (single-ticket autonomous pipeline):
 
 ```bash
 npx skills add chroline/oliver/skills/factory
+```
+
+Run this when you only want Babysit (watch open PRs / stacks):
+
+```bash
+npx skills add chroline/oliver/skills/babysit
 ```
 
 ## Install every skill
@@ -58,6 +65,9 @@ skills/
     oliverspec-babysit/
     oliverspec-ship/
   factory/             ← standalone: npx skills add chroline/oliver/skills/factory
+    README.md
+    SKILL.md
+  babysit/             ← standalone: npx skills add chroline/oliver/skills/babysit
     README.md
     SKILL.md
 ```
