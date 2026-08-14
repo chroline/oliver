@@ -30,5 +30,5 @@ npx skills add chroline/oliver/skills/babysit
 
 ## Related
 
-- Single-ticket pipeline that calls this after opening PRs: [Factory](../factory/README.md)
-- Project-wide babysit for OliverSpec: [oliverspec-babysit](../oliverspec/oliverspec-babysit/SKILL.md)
+- Single-ticket pipeline that calls this after opening PRs: [Factory](../factory/README.md) (vendored installs may use `chroline-factory`)
+- Project-wide babysit for OliverSpec: [oliverspec-babysit](../oliverspec/oliverspec-babysit/SKILL.md) (same folder name when vendored alongside OliverSpec skills)
