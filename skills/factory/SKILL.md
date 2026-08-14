@@ -10,7 +10,7 @@ disable-model-invocation: true
 license: MIT
 metadata:
   author: chroline
-  version: "1.0"
+  version: "1.1"
 ---
 
 Run a **single Linear ticket** end-to-end as an autonomous software factory.
@@ -55,7 +55,8 @@ Rules:
   plan.md           # living plan (planner writes, parent updates after critique)
   critique-N.md     # each blind critique round
   meta.json         # models, ticket url, branch, PR numbers, status
-  screenshots/      # Storybook captures for frontend changes (png/webp)
+  proof/            # end-to-end proof before any PR (commands log, screenshots, recordings)
+  screenshots/      # UI captures (png/webp) and/or short screen recordings (mp4/webm)
 ```
 
 Also create a sibling worktree root **outside** the repo:
@@ -143,10 +144,17 @@ Launch `Task` with **implementer** model. Contract:
 
 - Cwd = that worktree only
 - Follow `plan.md` + ticket ACs; TDD (red → stubs typecheck → green)
-- **Frontend / UI changes (mandatory when applicable):** verify in Storybook — add or update stories for every changed component/state, run Storybook, capture screenshots of the relevant stories (default, key variants, empty/loading/error if touched). Save files under `/tmp/factory/<ISSUE-ID>/screenshots/` with stable names (`button-default.png`, etc.). No Storybook verification = frontend work is incomplete
+- **Prove end-to-end before any PR (mandatory):** after tests are green, exercise the change the way a user/agent would in this repo (CLI command, API call, script, local app path, etc.). Write a short proof log to `/tmp/factory/<ISSUE-ID>/proof/e2e.md` with: what you ran, expected vs actual, and pass/fail. **No PR until this proof exists and passes.**
+- **Frontend / UI changes (mandatory when applicable):**
+  1. Verify in Storybook — add or update stories for every changed component/state
+  2. Capture **screenshots and/or a short screen recording** of the feature working (default + key variants; empty/loading/error if touched). Prefer a recording when the change is interactive (flows, animations, multi-step UI)
+  3. Save under `/tmp/factory/<ISSUE-ID>/screenshots/` with stable names (`button-default.png`, `checkout-flow.mp4`, etc.)
+  4. Incomplete without Storybook verification **and** at least one screenshot or recording of the feature
 - Do **not** open PRs yet; do **not** run `gh stack`
-- Commit on the branch; push when implementation + tests are green
-- Return: files changed, test summary, residual risks, approximate diffstat, screenshot paths (if any)
+- Commit on the branch; push when implementation + tests + e2e proof are green
+- Return: files changed, test summary, proof path, residual risks, approximate diffstat, screenshot/recording paths (if any)
+
+Parent **gates PR creation** on proof: read `proof/e2e.md` (and screenshot/recording files when UI changed). Missing or failing proof → send implementer back; do not open PRs.
 
 Parent removes nothing yet — needs the branch for size check / possible split.
 
@@ -173,8 +181,14 @@ Treat as **excluded**: migration folders, snapshot dirs, `*.snap`, lockfiles, ob
 
 1. Decompose into a linear stack of reviewable layers (tests/types → core → wiring → cleanup) matching the plan’s PR split proposal
 2. Rebuild history onto stacked branches (`<linear-branch>`, `<linear-branch>-2`, …) or interactive-equivalent non-interactive splits (`git reset`, cherry-picks, or fresh worktrees per layer)
-3. Each layer: own branch, own commits, own PR via `gh pr create --base <parent-branch>`
+3. Each layer: own branch, own commits, own PR via `gh pr create --base <parent-branch>` (**ready**, never `--draft`)
 4. Parent only: `gh stack init` / `gh stack link` (same rules as OliverSpec — **never** from a sub-agent). Exit 9 → chained plain PRs with `--base`
+
+**PRs must be ready (not draft) before any CI watch:**
+
+- Open with `gh pr create` **without** `--draft`. Do **not** use `gh stack submit` (it opens drafts and drops the body)
+- Immediately after create, confirm `isDraft == false` via `gh pr view <n> --json isDraft`
+- If any PR is draft: `gh pr ready <n>` (or equivalent) until ready. **Do not enter the babysit / green-CI loop while any factory PR is still draft**
 
 PR title: `<ISSUE-ID>: <short title>` (add `(n/m)` when stacked).
 
@@ -199,34 +213,40 @@ PR body:
 ## Acceptance Criteria
 - [x] / [ ] from ticket
 
+## E2E proof
+- Proof log: /tmp/factory/<ISSUE-ID>/proof/e2e.md (summarize commands + result here)
+- [x] Exercised end-to-end before opening this PR
+
 ## Test plan
 - [ ] ...
 - [ ] Storybook: stories updated + visually verified (frontend only)
 
-## Screenshots
-<!-- Required for any frontend/UI change. Embed the actual images in the PR body
-     (upload to the PR / paste image bytes so GitHub hosts them on this PR).
-     Caption each: story name + state. "n/a — no UI" only when zero frontend diff. -->
+## Screenshots / recordings
+<!-- Required for any frontend/UI change. Embed screenshots and/or a short screen
+     recording in the PR body (upload so GitHub hosts them on this PR).
+     Caption each: story/feature + state. "n/a — no UI" only when zero frontend diff. -->
 ```
 
-**After PRs are open — frontend screenshot distribution (parent):**
+**After PRs are open — frontend proof distribution (parent):**
 
-1. Embed screenshots in each relevant PR description (`## Screenshots`) — images must render in the PR body
-2. Post a Linear issue comment that **uploads** the same screenshot files as attachments (Linear file upload / image attach on the comment). **Do not** paste GitHub/user-content URLs as a substitute — Linear must get the binary upload
-3. Caption each image with Storybook story id/name + state
-4. If stacked, attach screenshots on the layer that introduces the UI (and mention layer in the Linear comment)
+1. Embed screenshots **and/or screen recordings** in each relevant PR description (`## Screenshots / recordings`) — media must render or play from the PR body
+2. Post a Linear issue comment that **uploads** the same media files as attachments (Linear file upload / image or video attach on the comment). **Do not** paste GitHub/user-content URLs as a substitute — Linear must get the binary upload
+3. Caption each with Storybook story id/name + state (or feature flow name for recordings)
+4. If stacked, attach media on the layer that introduces the UI (and mention layer in the Linear comment)
 
-Link PRs on the Linear issue. `meta.json` → PR numbers + `status: "prs_open"`.
+Link PRs on the Linear issue. `meta.json` → PR numbers + `status: "prs_open"` only after every PR is **ready** (not draft).
 
 ### 6. Babysit until the stack is mergeable
 
+**Precondition:** every factory PR is **ready** (not draft). If any is draft, mark ready first; do not watch CI yet.
+
 Loop (do not stop after one cycle):
 
-1. Snapshot every PR: `gh pr view <n> --json statusCheckRollup,reviews,reviewDecision,mergeable,mergeStateStatus,url,title,number,headRefName,baseRefName` + unresolved threads
+1. Snapshot every PR: `gh pr view <n> --json isDraft,statusCheckRollup,reviews,reviewDecision,mergeable,mergeStateStatus,url,title,number,headRefName,baseRefName` + unresolved threads
 2. **Ignore** stack merge-readiness / merge-queue-position / “rebase stack” gates as CI failures
 3. Fix real CI failures and actionable review comments (prefer 1 PR → 1 sub-agent → 1 worktree). Parent runs all `gh stack rebase|sync|push` serially from the main checkout with fix worktrees removed
 4. Re-watch CI until green; re-enter loop on new failures/comments
-5. Done when every PR: real CI green, no unresolved actionable threads, `mergeable` / stack is ready to merge bottom-up
+5. Done when every PR: ready (not draft), real CI green, no unresolved actionable threads, `mergeable` / stack is ready to merge bottom-up
 
 Hard blockers → pause and report (permissions, flaky infra outside scope, conflicting human feedback).
 
@@ -275,7 +295,7 @@ On green-light (`merge`, `ship it`, `LGTM merge`, etc.):
 | **Parent** | Preflight, Linear state/comments, model routing, critique loop orchestration, worktree lifecycle, size gate + split, all `gh stack` commands, babysit coordination, user notify, merge |
 | **Planner Task** | Code exploration + `plan.md` (+ revisions) |
 | **Critic Task** | Blind `critique-N.md` only |
-| **Implementer Task** | Code + tests + commits (+ push); no PRs / no `gh stack` unless parent delegated a single-PR `gh pr create` |
+| **Implementer Task** | Code + tests + e2e proof + commits (+ push); no PRs / no `gh stack` unless parent delegated a single-PR `gh pr create` (ready, never draft) |
 | **Fix Tasks** | Per-PR CI/comment fixes in isolated worktrees; push only |
 
 ---
@@ -286,11 +306,13 @@ On green-light (`merge`, `ship it`, `LGTM merge`, etc.):
 - **Plan before code** — no implementer until critique loop settles and the Linear comment is posted
 - **Blind critique** — critic never sees planner chain-of-thought; only plan file + ticket
 - **TDD** — failing tests + typecheck-clean stubs, then implement backwards
+- **E2E proof before PR** — no `gh pr create` until `/tmp/factory/<ISSUE-ID>/proof/e2e.md` shows a passing end-to-end exercise of the change
 - **GitHub stacks, not Graphite** — `gh stack`; never `gt`
 - **Only parent runs `gh stack`**, serially, main checkout, worktrees removed
+- **Ready PRs only** — never open or babysit drafts; `gh pr create` without `--draft`, confirm `isDraft=false`, `gh pr ready` if needed **before** watching CI
 - **≥1500 filtered lines ⇒ justify in the PR description or split** — no silent monoliths; a large single PR without a Size-gate justification section is not allowed
-- **Frontend ⇒ Storybook + screenshots** — every UI change is verified in Storybook; screenshots go in the PR description **and** as **uploaded** attachments on a Linear ticket comment (not GitHub links)
+- **Frontend ⇒ Storybook + screenshots/recordings** — every UI change is verified in Storybook; include screenshots **or** a screen recording of the feature in the PR description **and** as **uploaded** attachments on a Linear ticket comment (not GitHub links)
 - **Never merge without explicit user green-light** after the mergeable notify
 - **Never push to trunk** outside `gh stack merge`
 - Factory files stay under `/tmp/factory/...` and `../.factory-worktrees/...`
-- Ignore stack merge-readiness gates while babysitting; still require real CI green
+- Ignore stack merge-readiness gates while babysitting; still require real CI green + ready (non-draft) PRs
