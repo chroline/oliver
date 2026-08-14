@@ -25,7 +25,7 @@ npx skills add chroline/oliver/skills/factory
 6. Size gate: ≥1500 filtered lines (minus migrations/snapshots) must be justified **in the PR description** or split into `gh stack` PRs
 7. Opens **ready** (non-draft) PRs only — never babysit drafts; mark ready before watching CI
 8. Frontend: Storybook verification; **screenshots or screen recording** in the PR body **and** uploaded on a Linear comment (not GitHub links)
-9. Babysits CI + review until the stack is mergeable
+9. Invokes the **`babysit`** skill until the stack is mergeable (CI + comments; ready PRs only)
 10. **Stops and notifies you** — merges only after your green-light
 
 ## What you need
@@ -33,7 +33,9 @@ npx skills add chroline/oliver/skills/factory
 - **Linear MCP**
 - **GitHub CLI (`gh`) 2.90.0+** with `gh extension install github/gh-stack`
 - Stacked PRs enabled on the repo (or Factory falls back to chained plain PRs)
+- The sibling **`babysit`** skill available in the agent (same repo: `skills/babysit`)
 
 ## Related
 
+- Watch-only skill (callable alone): [Babysit](../babysit/README.md)
 - Full project workflow: [OliverSpec](../oliverspec/README.md)
