@@ -10,7 +10,7 @@ disable-model-invocation: true
 license: MIT
 metadata:
   author: chroline
-  version: "1.0"
+  version: "1.1"
 ---
 
 Run a **single Linear ticket** end-to-end as an autonomous software factory.
@@ -91,42 +91,121 @@ Launch a `Task` (`generalPurpose`) with **planner** model. Prompt must include:
 - Full issue title, description, acceptance criteria, labels, relations
 - Repo pointers the parent already knows (paths, conventions) — keep it factual, not a solution
 - Absolute path `/tmp/factory/<ISSUE-ID>/plan.md` to write
-- Instruction: produce an **in-depth implementation plan**, not code
+- Instruction: produce a **concise, executable implementation plan** — not code, not a design essay
+- The conciseness rules + template below (paste them into the planner prompt)
 
-**Plan must cover:**
+**Conciseness (hard rules):**
 
-1. Goal + non-goals (scoped to this ticket only)
-2. Current-state findings (files, modules, constraints) — explore the codebase
-3. Approach + alternatives considered (and why rejected)
-4. Detailed design: data model, APIs, control flow, edge cases, failure modes
-5. **Mermaid diagrams** wherever they clarify (architecture, sequence, state, dependency) — at least one if the change touches >1 module
-6. File-by-file change list (create/edit/delete) with intent per file
-7. TDD sequence: tests first → typecheck-clean stubs → implement to green
-8. Test plan + commands to run
-9. If any UI/frontend surface changes: Storybook stories to add/update + which states to capture
-10. Rollout / migration / feature-flag notes if relevant
-11. Risks, open questions, and explicit "out of scope"
-12. PR split proposal (atomic layers) — even if likely one PR
+- Target **40–80 lines**. Over ~120 lines is a design doc — cut until it isn't.
+- Lists and tables only. Intro is 2–4 sentences. No restating the ticket.
+- No code, pseudocode dumps, or file-by-file essays. One line per task/file.
+- Do not add a "detailed design" section. Mechanism lives in the task table.
+- Cite ticket ACs (`AC-2`) instead of copying them.
+- Omit empty optional sections.
+- Identifiers (`REQ-001`, `TASK-001`, …) are declared once as the leading cell / bold prefix; later mentions are references.
 
-Parent reads `plan.md`. If thin or missing diagrams where needed, send the planner back once with concrete gaps.
+**Plan must still cover** (one-liners / tables, not essays):
+
+- **Mermaid diagrams** wherever they clarify (architecture, sequence, state, dependency) — at least one if the change touches >1 module
+- **TDD sequence:** tests first → typecheck-clean stubs → implement to green (encode that order in the task table)
+- **Test plan + commands** to run
+- If any UI/frontend surface changes: **Storybook** stories to add/update + which states to capture
+- **Rollout / migration / feature-flag** notes if relevant
+- **Risks, open questions, and explicit "out of scope"**
+
+**Template** (required headers, exact; skip a section only if it would be empty):
+
+````md
+# <one-line goal>
+
+<2–4 sentences: what changes and where. Then 3–6 bullets of current-state files/modules.>
+
+**Non-goals:**
+- ...
+
+```mermaid
+<architecture / sequence / state / dependency — required if the change touches >1 module>
+```
+
+## 1. Requirements & Constraints
+
+- **REQ-001**: ...
+- **CON-001**: ...
+
+## 2. Implementation
+
+TDD: tests first → typecheck-clean stubs → implement to green.
+
+### Phase 1
+
+- GOAL-001: <phase outcome>
+
+| Task | Description | Completed |
+|------|-------------|-----------|
+| TASK-001 | <one sentence + path(s); tests-first> | |
+| TASK-002 | ... | |
+
+### Phase 2
+
+- GOAL-002: ...
+
+| Task | Description | Completed |
+|------|-------------|-----------|
+| TASK-003 | ... | |
+
+## 3. Alternatives
+
+- **ALT-001**: <rejected approach> — <why, one clause>
+
+## 4. Files
+
+- **FILE-001**: `path` — create|edit|delete — <intent, one clause>
+
+## 5. Testing
+
+- **TEST-001**: <what to prove> — `command`
+- Storybook: <story id + states to capture> (or `n/a — no UI`)
+
+## 6. Rollout
+
+- Migration / feature-flag / rollout notes, or `n/a`
+
+## 7. Risks & Assumptions
+
+- **RISK-001**: ...
+- **ASSUMPTION-001**: ...
+- Open questions: ...
+- Out of scope: ...
+
+## 8. PR split
+
+- 1/1 — <intent>   (or stacked layers: tests/types → core → wiring)
+````
+
+Include **Dependencies** (`DEP-001`) only when they change the work.
+
+Parent reads `plan.md`. Send the planner back **once** only if required coverage is missing (mermaid when >1 module, TDD order, test commands, Storybook on UI, rollout-or-n/a, risks/open questions/out of scope), tasks lack paths, or the file is a prose essay. Do **not** send back to add more detail.
 
 ### 2. Blind critique ↔ update loop
 
 Repeat until the critic returns **APPROVED** (no blocking findings) or **3 rounds** complete:
 
 1. **Critic** — fresh `Task` with **critic** model. Blind: give **only** `plan.md` contents + the raw Linear ticket text. No planner chat, no “please be nice.” Ask for:
-   - Blocking gaps / wrong assumptions / missing edge cases
+   - Blocking gaps / wrong assumptions / missing edge cases that would make implementation fail
    - Over-scope or under-scope vs the ticket
-   - Diagram / sequencing issues
-   - Test-plan holes
+   - Unexecutable tasks (no path, vague "implement X")
+   - Diagram / sequencing issues (missing mermaid when the change touches >1 module)
+   - Test-plan holes (missing command or AC untested)
+   - Missing Storybook stories/states when the plan touches UI; missing rollout/migration/flag notes when relevant
    - Verdict: `APPROVED` | `REVISE` with a numbered change list
+   - **Do not** request more prose or a deeper design writeup. Concise + executable is the bar. A plan that follows the template and covers the required items above is `APPROVED` even if short.
    - Write `/tmp/factory/<ISSUE-ID>/critique-<N>.md`
-2. If `REVISE`: **Planner** (same planner model) updates `plan.md` addressing every numbered item. Do not dilute the critique.
+2. If `REVISE`: **Planner** (same planner model) updates `plan.md` addressing every numbered item **without adding length**. Prefer replacing a vague line over appending a new section. Do not dilute the critique.
 3. If round 3 still `REVISE`: fold remaining blocking items into the plan as explicit risks / AC, and proceed (note them in the Linear comment).
 
 ### 3. Comment the plan on the Linear ticket
 
-Post **one** comment on the issue with the **full** settled `plan.md` body (including mermaid). Prefer Linear’s issue comment API (`save_comment` / equivalent). If the body exceeds Linear limits, split into threaded comments labeled `Plan (1/N)`… and keep the files in `/tmp/factory/...` as source of truth.
+Post **one** comment on the issue with the **full** settled `plan.md` body. Prefer Linear’s issue comment API (`save_comment` / equivalent). If the body exceeds Linear limits, split into threaded comments labeled `Plan (1/N)`… and keep the files in `/tmp/factory/...` as source of truth.
 
 Also write `meta.json` → `status: "planned"`.
 
@@ -284,6 +363,7 @@ On green-light (`merge`, `ship it`, `LGTM merge`, etc.):
 
 - **One Linear ticket** per factory run — don’t expand into a mini-project of new tickets unless the user asks
 - **Plan before code** — no implementer until critique loop settles and the Linear comment is posted
+- **Plans are checklists, not design docs** — template + ~80 lines; critic may not demand more prose
 - **Blind critique** — critic never sees planner chain-of-thought; only plan file + ticket
 - **TDD** — failing tests + typecheck-clean stubs, then implement backwards
 - **GitHub stacks, not Graphite** — `gh stack`; never `gt`

@@ -18,7 +18,7 @@ npx skills add chroline/oliver/skills/factory
 ## What it does
 
 1. Loads a Linear ticket
-2. Smart-model **plan** → `/tmp/factory/<ISSUE-ID>/plan.md` (mermaid where useful)
+2. Smart-model **plan** → `/tmp/factory/<ISSUE-ID>/plan.md` (concise task tables, not a design essay)
 3. Different smart-model **blind-critiques** the plan; revise until settled (max 3 rounds)
 4. Comments the full plan on the ticket
 5. Implementer sub-agent (best Grok, else Sonnet / GPT terra) lands the work via TDD
