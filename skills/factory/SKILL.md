@@ -92,97 +92,29 @@ Launch a `Task` (`generalPurpose`) with **planner** model. Prompt must include:
 - Repo pointers the parent already knows (paths, conventions) — keep it factual, not a solution
 - Absolute path `/tmp/factory/<ISSUE-ID>/plan.md` to write
 - Instruction: produce a **concise, executable implementation plan** — not code, not a design essay
-- The conciseness rules + template below (paste them into the planner prompt)
+- Instruction: **explore the repo first**. Current-state bullets must cite verified paths/modules, not guesses
+- The conciseness rules below, plus the full contents of `plan-template.md` from this skill directory (paste that file into the planner prompt)
 
 **Conciseness (hard rules):**
 
 - Target **40–80 lines**. Over ~120 lines is a design doc — cut until it isn't.
 - Lists and tables only. Intro is 2–4 sentences. No restating the ticket.
-- No code, pseudocode dumps, or file-by-file essays. One line per task/file.
-- Do not add a "detailed design" section. Mechanism lives in the task table.
+- No code, pseudocode dumps, or file-by-file essays. One line per task; file paths live **only** in TASK rows.
+- Do not add a "detailed design" or "Files" section. Mechanism + paths live in the task table.
 - Cite ticket ACs (`AC-2`) instead of copying them.
-- Omit empty optional sections.
+- Omit empty optional sections (Dependencies; mermaid when the change is a single module).
 - Identifiers (`REQ-001`, `TASK-001`, …) are declared once as the leading cell / bold prefix; later mentions are references.
 
 **Plan must still cover** (one-liners / tables, not essays):
 
-- **Mermaid diagrams** wherever they clarify (architecture, sequence, state, dependency) — at least one if the change touches >1 module
+- **Mermaid diagrams** wherever they clarify (architecture, sequence, state, dependency) — at least one if the change touches >1 module; omit if single-module
 - **TDD sequence:** tests first → typecheck-clean stubs → implement to green (encode that order in the task table)
 - **Test plan + commands** to run
 - If any UI/frontend surface changes: **Storybook** stories to add/update + which states to capture
 - **Rollout / migration / feature-flag** notes if relevant
 - **Risks, open questions, and explicit "out of scope"**
 
-**Template** (required headers, exact; skip a section only if it would be empty):
-
-````md
-# <one-line goal>
-
-<2–4 sentences: what changes and where. Then 3–6 bullets of current-state files/modules.>
-
-**Non-goals:**
-- ...
-
-```mermaid
-<architecture / sequence / state / dependency — required if the change touches >1 module>
-```
-
-## 1. Requirements & Constraints
-
-- **REQ-001**: ...
-- **CON-001**: ...
-
-## 2. Implementation
-
-TDD: tests first → typecheck-clean stubs → implement to green.
-
-### Phase 1
-
-- GOAL-001: <phase outcome>
-
-| Task | Description | Completed |
-|------|-------------|-----------|
-| TASK-001 | <one sentence + path(s); tests-first> | |
-| TASK-002 | ... | |
-
-### Phase 2
-
-- GOAL-002: ...
-
-| Task | Description | Completed |
-|------|-------------|-----------|
-| TASK-003 | ... | |
-
-## 3. Alternatives
-
-- **ALT-001**: <rejected approach> — <why, one clause>
-
-## 4. Files
-
-- **FILE-001**: `path` — create|edit|delete — <intent, one clause>
-
-## 5. Testing
-
-- **TEST-001**: <what to prove> — `command`
-- Storybook: <story id + states to capture> (or `n/a — no UI`)
-
-## 6. Rollout
-
-- Migration / feature-flag / rollout notes, or `n/a`
-
-## 7. Risks & Assumptions
-
-- **RISK-001**: ...
-- **ASSUMPTION-001**: ...
-- Open questions: ...
-- Out of scope: ...
-
-## 8. PR split
-
-- 1/1 — <intent>   (or stacked layers: tests/types → core → wiring)
-````
-
-Include **Dependencies** (`DEP-001`) only when they change the work.
+Follow `plan-template.md` headers exactly. Skip a section only if it would be empty.
 
 Parent reads `plan.md`. Send the planner back **once** only if required coverage is missing (mermaid when >1 module, TDD order, test commands, Storybook on UI, rollout-or-n/a, risks/open questions/out of scope), tasks lack paths, or the file is a prose essay. Do **not** send back to add more detail.
 
