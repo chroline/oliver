@@ -3,19 +3,19 @@ name: factory
 description: >
   Autonomous software factory for a single Linear ticket — plan with a smart
   model, blind-critique and refine the plan, comment it on the ticket, implement
-  via sub-agent, open atomic stacked PRs, babysit CI/review until mergeable, then
-  merge on user green-light. Use when the user wants /factory, factory, or to
-  fully drive one Linear ticket from plan → PRs → merge.
+  via sub-agent, open atomic stacked PRs, then invoke the standalone babysit
+  skill to fix CI/review and merge on user green-light. Use when the user wants
+  /factory, factory, or to fully drive one Linear ticket from plan → PRs → merge.
 disable-model-invocation: true
 license: MIT
 metadata:
   author: chroline
-  version: "1.1"
+  version: "1.2"
 ---
 
 Run a **single Linear ticket** end-to-end as an autonomous software factory.
 
-No explore/propose/scope. No project-wide waves. One ticket → plan → critique loop → implement → stack if needed → babysit → wait for user → merge.
+No explore/propose/scope. No project-wide waves. One ticket → plan → critique loop → implement → stack if needed → invoke the standalone `babysit` skill.
 
 Announce: `Factory: <ISSUE-ID> — <title>`.
 
@@ -229,52 +229,23 @@ PR body:
 
 Link PRs on the Linear issue. `meta.json` → PR numbers + `status: "prs_open"`.
 
-### 6. Babysit until the stack is mergeable
+### 6. Invoke the standalone Babysit skill
 
-Loop (do not stop after one cycle):
+Load and execute the sibling `babysit` skill for this issue immediately after the PRs are open. This is an automatic continuation of Factory, not a suggestion for the user to run another command.
 
-1. Snapshot every PR: `gh pr view <n> --json statusCheckRollup,reviews,reviewDecision,mergeable,mergeStateStatus,url,title,number,headRefName,baseRefName` + unresolved threads
-2. **Ignore** stack merge-readiness / merge-queue-position / “rebase stack” gates as CI failures
-3. Fix real CI failures and actionable review comments (prefer 1 PR → 1 sub-agent → 1 worktree). Parent runs all `gh stack rebase|sync|push` serially from the main checkout with fix worktrees removed
-4. Re-watch CI until green; re-enter loop on new failures/comments
-5. Done when every PR: real CI green, no unresolved actionable threads, `mergeable` / stack is ready to merge bottom-up
+Pass it:
 
-Hard blockers → pause and report (permissions, flaky infra outside scope, conflicting human feedback).
+- The Linear issue ID and already-loaded issue context
+- `/tmp/factory/<ISSUE-ID>/meta.json`
+- The PR numbers / stack identity and current checkout details
+- Any known CI, screenshot, or residual-risk context
 
-### 7. Notify user — **stop for green-light**
+Do not duplicate Babysit's loop or merge rules here. Babysit owns status snapshots, per-layer CI/review fixes, waiting for real CI, the mergeable notification, the explicit user green-light boundary, bottom-up merge, and moving Linear to Done.
 
-When the stack is mergeable, **stop and notify**. Do **not** merge yet.
+If the `babysit` skill is unavailable, stop after opening/linking PRs and tell the user to install it with:
 
-```
-## Factory — ready to merge
-
-**Ticket:** <ISSUE-ID> — <title> (<url>)
-**Stack:** #<stack-number> (or chained PRs)
-**Plan:** /tmp/factory/<ISSUE-ID>/plan.md (+ Linear comment)
-
-| PR | Base | CI | Reviews |
-|----|------|----|---------|
-| #n | ... | green | clean |
-
-Reply **merge** (or green-light) and I will merge the stack bottom-up.
-```
-
-### 8. Merge (only after explicit user approval)
-
-On green-light (`merge`, `ship it`, `LGTM merge`, etc.):
-
-1. Re-check CI/comments one last time; if anything regressed, return to step 6
-2. `gh stack merge` bottom-up (or merge chained PRs bottom-up if stacks unavailable)
-3. `gh stack sync --prune` when applicable
-4. Move Linear issue to **Done**
-5. `meta.json` → `status: "merged"`
-
-```
-## Factory Complete
-
-**Ticket:** <ISSUE-ID>
-**Merged:** <PR urls>
-**Linear:** Done
+```bash
+npx skills add chroline/oliver/skills/babysit
 ```
 
 ---
@@ -283,7 +254,7 @@ On green-light (`merge`, `ship it`, `LGTM merge`, etc.):
 
 | Actor | Does |
 |-------|------|
-| **Parent** | Preflight, Linear state/comments, model routing, critique loop orchestration, worktree lifecycle, size gate + split, all `gh stack` commands, babysit coordination, user notify, merge |
+| **Parent** | Preflight, Linear state/comments, model routing, critique loop orchestration, worktree lifecycle, size gate + split, PR creation/linking, invoke `babysit` |
 | **Planner Task** | Code exploration + `plan.md` (+ revisions) |
 | **Critic Task** | Blind `critique-N.md` only |
 | **Implementer Task** | Code + tests + commits (+ push); no PRs / no `gh stack` unless parent delegated a single-PR `gh pr create` |
@@ -302,7 +273,7 @@ On green-light (`merge`, `ship it`, `LGTM merge`, etc.):
 - **Only parent runs `gh stack`**, serially, main checkout, worktrees removed
 - **≥1500 filtered lines ⇒ justify in the PR description or split** — no silent monoliths; a large single PR without a Size-gate justification section is not allowed
 - **Frontend ⇒ Storybook + screenshots** — every UI change is verified in Storybook; screenshots go in the PR description **and** as **uploaded** attachments on a Linear ticket comment (not GitHub links)
-- **Never merge without explicit user green-light** after the mergeable notify
-- **Never push to trunk** outside `gh stack merge`
+- **Babysit is mandatory after PR creation** — invoke the standalone skill automatically; do not inline its workflow
+- **Never merge without explicit user green-light** after Babysit's mergeable notification
+- **Never push to trunk** outside Babysit's bottom-up merge
 - Factory files stay under `/tmp/factory/...` and `../.factory-worktrees/...`
-- Ignore stack merge-readiness gates while babysitting; still require real CI green

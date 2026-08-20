@@ -12,6 +12,7 @@ I group skills into suites (or standalone skills) so you can install one workflo
 |---------|---------|------|
 | **OliverSpec** (suite) | `npx skills add chroline/oliver/skills/oliverspec` | [OliverSpec README](./skills/oliverspec/README.md) |
 | **Factory** (standalone) | `npx skills add chroline/oliver/skills/factory` | [Factory README](./skills/factory/README.md) |
+| **Babysit** (standalone) | `npx skills add chroline/oliver/skills/babysit` | [Babysit README](./skills/babysit/README.md) |
 
 ## Install a suite
 
@@ -21,10 +22,17 @@ Run this when you only want OliverSpec:
 npx skills add chroline/oliver/skills/oliverspec
 ```
 
-Run this when you only want Factory (single-ticket autonomous pipeline):
+Run these when you want Factory's single-ticket pipeline and its automatic PR follow-through:
 
 ```bash
 npx skills add chroline/oliver/skills/factory
+npx skills add chroline/oliver/skills/babysit
+```
+
+Run this when PRs already exist and you only need CI/review fixes through merge:
+
+```bash
+npx skills add chroline/oliver/skills/babysit
 ```
 
 ## Install every skill
@@ -58,6 +66,9 @@ skills/
     oliverspec-babysit/
     oliverspec-ship/
   factory/             ← standalone: npx skills add chroline/oliver/skills/factory
+    README.md
+    SKILL.md
+  babysit/             ← standalone: npx skills add chroline/oliver/skills/babysit
     README.md
     SKILL.md
 ```
