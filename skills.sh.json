@@ -16,9 +16,16 @@
     },
     {
       "title": "Factory",
-      "description": "Autonomous single Linear-ticket factory: plan → critique → implement → stack → babysit → merge on green-light. Install: npx skills add chroline/oliver/skills/factory",
+      "description": "Autonomous single Linear-ticket factory: plan → critique → implement → stack, then invoke Babysit. Install: npx skills add chroline/oliver/skills/factory",
       "skills": [
         "factory"
+      ]
+    },
+    {
+      "title": "Babysit",
+      "description": "Take one Linear ticket's open PRs through real CI and review fixes, explicit approval, and bottom-up merge. Install: npx skills add chroline/oliver/skills/babysit",
+      "skills": [
+        "babysit"
       ]
     }
   ]
