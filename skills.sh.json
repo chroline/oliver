@@ -27,6 +27,13 @@
       "skills": [
         "babysit"
       ]
+    },
+    {
+      "title": "Lab Notebook",
+      "description": "Keep experiments and investigations in one Markdown file with a concise current summary and append-only chronological entries. Install: npx skills add chroline/oliver/skills/lab-notebook",
+      "skills": [
+        "lab-notebook"
+      ]
     }
   ]
 }
