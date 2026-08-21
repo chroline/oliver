@@ -13,6 +13,7 @@ I group skills into suites (or standalone skills) so you can install one workflo
 | **OliverSpec** (suite) | `npx skills add chroline/oliver/skills/oliverspec` | [OliverSpec README](./skills/oliverspec/README.md) |
 | **Factory** (standalone) | `npx skills add chroline/oliver/skills/factory` | [Factory README](./skills/factory/README.md) |
 | **Babysit** (standalone) | `npx skills add chroline/oliver/skills/babysit` | [Babysit README](./skills/babysit/README.md) |
+| **Lab Notebook** (standalone) | `npx skills add chroline/oliver/skills/lab-notebook` | [Lab Notebook README](./skills/lab-notebook/README.md) |
 
 ## Install a suite
 
@@ -33,6 +34,12 @@ Run this when PRs already exist and you only need CI/review fixes through merge:
 
 ```bash
 npx skills add chroline/oliver/skills/babysit
+```
+
+Run this to keep experimental evidence and current understanding in one Markdown file:
+
+```bash
+npx skills add chroline/oliver/skills/lab-notebook
 ```
 
 ## Install every skill
@@ -69,6 +76,9 @@ skills/
     README.md
     SKILL.md
   babysit/             ← standalone: npx skills add chroline/oliver/skills/babysit
+    README.md
+    SKILL.md
+  lab-notebook/        ← standalone: npx skills add chroline/oliver/skills/lab-notebook
     README.md
     SKILL.md
 ```
