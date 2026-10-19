@@ -31,6 +31,15 @@
       "skills": [
         "./skills/factory"
       ]
+    },
+    {
+      "name": "dashboard-ui",
+      "description": "Build compact, functional shadcn dashboards with useful charts, tables, and reliable navigation for any domain",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/dashboard-ui"
+      ]
     }
   ]
 }

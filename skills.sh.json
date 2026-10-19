@@ -34,6 +34,13 @@
       "skills": [
         "lab-notebook"
       ]
+    },
+    {
+      "title": "Dashboard UI",
+      "description": "Build compact, functional shadcn dashboards with layouts, charts, tables, and navigation suited to any domain. Install: npx skills add chroline/oliver/skills/dashboard-ui",
+      "skills": [
+        "dashboard-ui"
+      ]
     }
   ]
 }

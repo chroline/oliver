@@ -14,6 +14,7 @@ I group skills into suites (or standalone skills) so you can install one workflo
 | **Factory** (standalone) | `npx skills add chroline/oliver/skills/factory` | [Factory README](./skills/factory/README.md) |
 | **Babysit** (standalone) | `npx skills add chroline/oliver/skills/babysit` | [Babysit README](./skills/babysit/README.md) |
 | **Lab Notebook** (standalone) | `npx skills add chroline/oliver/skills/lab-notebook` | [Lab Notebook README](./skills/lab-notebook/README.md) |
+| **Dashboard UI** (standalone) | `npx skills add chroline/oliver/skills/dashboard-ui` | [Dashboard UI skill](./skills/dashboard-ui/SKILL.md) |
 
 ## Install a suite
 
@@ -40,6 +41,12 @@ Run this to keep experimental evidence and current understanding in one Markdown
 
 ```bash
 npx skills add chroline/oliver/skills/lab-notebook
+```
+
+Run this to build compact, functional shadcn dashboards for any domain:
+
+```bash
+npx skills add chroline/oliver/skills/dashboard-ui
 ```
 
 ## Install every skill
@@ -81,4 +88,9 @@ skills/
   lab-notebook/        ← standalone: npx skills add chroline/oliver/skills/lab-notebook
     README.md
     SKILL.md
+  dashboard-ui/        ← standalone: npx skills add chroline/oliver/skills/dashboard-ui
+    SKILL.md
+    agents/
+    references/
+    assets/
 ```

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dashboard UI"
+  short_description: "Build compact, functional shadcn dashboards"
+  default_prompt: "Use $dashboard-ui to build a compact, functional dashboard for my data and workflow."
