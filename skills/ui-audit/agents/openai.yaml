@@ -1,0 +1,4 @@
+interface:
+  display_name: "UI Audit"
+  short_description: "Thorough UI polish with visual regression checks"
+  default_prompt: "Use $ui-audit to audit and refine this UI, inspect the rendered result across relevant sizes and states, and document verified fixes and remaining gaps."
