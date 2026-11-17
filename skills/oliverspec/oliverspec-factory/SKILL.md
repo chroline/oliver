@@ -1,7 +1,8 @@
 ---
 name: oliverspec-factory
 description: >
-  Autonomous software factory for one Linear ticket or one user request — ask
+  Autonomous software factory for one unit of work — a Linear ticket or any
+  plain user request (Linear is optional) — ask
   the human every open design question up front, plan with the smartest model,
   critique the plan against the original requirements, implement with a
   sub-agent, critique the implementation against the acceptance criteria, run the repo's code
@@ -12,10 +13,10 @@ disable-model-invocation: true
 license: MIT
 metadata:
   author: chroline
-  version: "2.2"
+  version: "2.3"
 ---
 
-Run **one Linear ticket or one user request** end-to-end as an autonomous software factory.
+Run **one unit of work** end-to-end as an autonomous software factory. It can be a Linear ticket or a plain user request; **Linear is optional.** Without a ticket, skip every step marked "Linear ticket:" and use a short slug as `<ID>`.
 
 One unit of work → questions → plan ↔ critique → implement ↔ critique → code review → PR → CI → merge.
 
@@ -25,7 +26,7 @@ Announce: `Factory: <ID> — <title>`.
 
 ## Input
 
-- A Linear **issue ID** (e.g. `LEM-123`), **or** a free-form user request
+- A free-form user request (no ticket needed), **or** a Linear **issue ID** (e.g. `LEM-123`)
 - Optional overrides: model picks, skip-merge (stop when CI is green)
 
 If neither is given, ask once, then start.
@@ -145,7 +146,7 @@ Linear ticket: post the settled `plan.md` as one comment on the issue (split int
 
 ### 4. Implement (implementer sub-agent)
 
-Create an isolated worktree on the branch the repo's rules call for (the Linear issue's git branch when there is a ticket):
+Create an isolated worktree on the branch the repo's rules call for: the Linear issue's git branch when there is a ticket, otherwise a short descriptive branch from the slug (unless the repo requires a ticket, in which case follow its rules):
 
 ```bash
 git fetch origin
@@ -200,8 +201,8 @@ Only after the code review loop is clean and the proof gate still passes (re-run
 
 - Push the branch and open one **ready** PR with `gh pr create`, without `--draft`, following the repo's title and body rules.
 - Confirm it is not a draft: `gh pr view <PR> --json isDraft`. If it is, run `gh pr ready <PR>`. Do not start the CI loop on a draft.
-- Default title: `<ID>: <short title>`.
-- Default body: Summary, Linear link (`Fixes <ID>`), acceptance criteria checklist, test plan, **E2E proof** (summary of `proof/e2e.md`: commands and result), and **Screenshots / recordings** for any UI change (embedded so they render, each captioned with story or flow + state). Add any sections the repo requires.
+- Default title: `<ID>: <short title>` with a ticket; just `<short title>` without one.
+- Default body: Summary, Linear link (`Fixes <ID>`, ticket only), acceptance criteria checklist, test plan, **E2E proof** (summary of `proof/e2e.md`: commands and result), and **Screenshots / recordings** for any UI change (embedded so they render, each captioned with story or flow + state). Add any sections the repo requires.
 - Linear ticket: link the PR and upload the same screenshots/recordings to an issue comment as attachments (not GitHub links).
 - `meta.json` → PR number, `status: "pr_open"`.
 
@@ -253,7 +254,8 @@ With `skip-merge`, stop after step 8 and report the PR as ready.
 - **Test-first:** failing tests and typecheck-clean stubs, then implement to green.
 - **Prove it end to end before the PR.** `proof/e2e.md` must exist and pass.
 - **Ready PRs only.** Never open a draft or watch CI on one.
-- **Frontend ⇒ Storybook + screenshots and/or recordings**, in the PR body and uploaded to the Linear ticket.
+- **Frontend ⇒ Storybook + screenshots and/or recordings**, in the PR body (and uploaded to the Linear ticket when there is one).
+- **Linear is optional.** Every Linear step applies only when the run started from a ticket.
 - **Repo rules win** over this skill where they conflict.
 - **Never bypass CI or branch protection** to merge.
 - Factory files stay under `/tmp/oliverspec-factory/...` and `../.factory-worktrees/...`.
