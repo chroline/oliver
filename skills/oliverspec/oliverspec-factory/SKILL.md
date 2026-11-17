@@ -4,7 +4,7 @@ description: >
   Autonomous software factory for one Linear ticket or one user request — ask
   the human every open design question up front, plan with the smartest model,
   critique the plan against the original requirements, implement with a
-  sub-agent, critique the implementation against the plan, run the repo's code
+  sub-agent, critique the implementation against the acceptance criteria, run the repo's code
   review loop, open a PR, fix CI until green, then merge. Use when the user
   wants /oliverspec-factory, oliverspec-factory, /factory, or factory, or to
   fully drive one ticket or request from plan → PR → merge.
@@ -12,7 +12,7 @@ disable-model-invocation: true
 license: MIT
 metadata:
   author: chroline
-  version: "2.1"
+  version: "2.2"
 ---
 
 Run **one Linear ticket or one user request** end-to-end as an autonomous software factory.
@@ -168,8 +168,10 @@ Launch a sub-agent on the **implementer** model. Contract:
 
 Repeat until the critic returns **APPROVED** or 3 rounds complete:
 
-1. **Critic**: a fresh sub-agent on the **implementer's model**. Give it `requirements.md`, `decisions.md`, `plan.md`, the worktree path, and the diff against trunk. It checks the implementation **against the plan's requirements**:
-   - Each `REQ`, `CON`, `TASK`, and `TEST` item, and each acceptance criterion: done, partial, or missing, with file evidence
+1. **Critic**: a fresh sub-agent on the **implementer's model**. Give it `requirements.md`, `decisions.md`, `plan.md`, the worktree path, and the diff against trunk. It checks the implementation **against the acceptance criteria**:
+   - **Original acceptance criteria first.** Take them from `requirements.md`: the ticket's acceptance criteria, or, for a user request (or a ticket without explicit criteria), each behavior the original message or ticket asks for. Mark each done, partial, or missing, with file and test evidence. These are the source of truth; a plan item that drops or weakens one does not excuse it.
+   - **Then the plan's criteria.** Each `REQ`, `CON`, `TASK`, and `TEST` item: done, partial, or missing, with file evidence
+   - Any conflict between the plan and the original criteria (flag it; if it is a design question, the parent asks the human)
    - Each decision applied as written
    - Behavior or files the plan did not call for
    - Tests that exist but do not prove the requirement, and commands that do not pass (it runs them)
@@ -246,7 +248,7 @@ With `skip-merge`, stop after step 8 and report the PR as ready.
 
 - **One ticket or request per run.** Do not expand it into new tickets unless the human asks.
 - **The human makes every design decision.** Ask all open questions before the plan loop; stop and ask if a new one appears later.
-- **Critics compare against the source.** The plan critic checks the original requirements; the implementation critic checks the plan's requirements.
+- **Critics compare against the source.** The plan critic checks the original requirements; the implementation critic checks the original acceptance criteria (from the ticket or user message) and the plan's criteria, with the original winning.
 - **Order is fixed:** questions → plan loop → implement → implementation loop → proof gate → code review loop → PR → CI loop → merge. No PR before the review is clean.
 - **Test-first:** failing tests and typecheck-clean stubs, then implement to green.
 - **Prove it end to end before the PR.** `proof/e2e.md` must exist and pass.
