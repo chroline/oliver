@@ -14,6 +14,7 @@ I group skills into suites (or standalone skills) so you can install one workflo
 | **Babysit** (standalone) | `npx skills add chroline/oliver/skills/babysit` | [Babysit README](./skills/babysit/README.md) |
 | **Lab Notebook** (standalone) | `npx skills add chroline/oliver/skills/lab-notebook` | [Lab Notebook README](./skills/lab-notebook/README.md) |
 | **Dashboard UI** (standalone) | `npx skills add chroline/oliver/skills/dashboard-ui` | [Dashboard UI skill](./skills/dashboard-ui/SKILL.md) |
+| **UI Audit** (standalone) | `npx skills add chroline/oliver/skills/ui-audit` | [UI Audit skill](./skills/ui-audit/SKILL.md) |
 
 ## Install a suite
 
@@ -39,6 +40,12 @@ Run this to build compact, functional shadcn dashboards for any domain:
 
 ```bash
 npx skills add chroline/oliver/skills/dashboard-ui
+```
+
+Run this to audit and polish an existing UI with rendered inspection and regression checks:
+
+```bash
+npx skills add chroline/oliver/skills/ui-audit
 ```
 
 ## Install every skill
@@ -83,4 +90,8 @@ skills/
     agents/
     references/
     assets/
+  ui-audit/            ← standalone: npx skills add chroline/oliver/skills/ui-audit
+    SKILL.md
+    agents/
+    references/
 ```
