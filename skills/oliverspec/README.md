@@ -33,6 +33,7 @@ Each skill covers one stage of the workflow:
 | [`oliverspec-apply`](./oliverspec-apply/SKILL.md) | Implement the project in one session via TDD (failing tests + typecheck-clean stubs, then implement backwards). Fan out parallel sub-agents (1 ticket → 1 agent → 1 worktree), mark tickets In Progress, open one stacked PR per ticket. |
 | [`oliverspec-babysit`](./oliverspec-babysit/SKILL.md) | Clear open PR comments and CI failures across the stack. Wait for real CI. Ignore stack merge-readiness gates. |
 | [`oliverspec-ship`](./oliverspec-ship/SKILL.md) | Merge the stack bottom-up with `gh stack merge` once it's clean, then move the Linear project to Completed. |
+| [`oliverspec-factory`](./oliverspec-factory/SKILL.md) | Standalone single-ticket (or single-request) run: ask the human every design question, plan ↔ critique, implement ↔ critique, code review loop, PR, fix CI until green, merge. See the [Factory README](./oliverspec-factory/README.md). |
 
 ## How I write the PRD and TRD
 

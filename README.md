@@ -11,7 +11,6 @@ I group skills into suites (or standalone skills) so you can install one workflo
 | Package | Install | Docs |
 |---------|---------|------|
 | **OliverSpec** (suite) | `npx skills add chroline/oliver/skills/oliverspec` | [OliverSpec README](./skills/oliverspec/README.md) |
-| **Factory** (standalone) | `npx skills add chroline/oliver/skills/factory` | [Factory README](./skills/factory/README.md) |
 | **Babysit** (standalone) | `npx skills add chroline/oliver/skills/babysit` | [Babysit README](./skills/babysit/README.md) |
 | **Lab Notebook** (standalone) | `npx skills add chroline/oliver/skills/lab-notebook` | [Lab Notebook README](./skills/lab-notebook/README.md) |
 | **Dashboard UI** (standalone) | `npx skills add chroline/oliver/skills/dashboard-ui` | [Dashboard UI skill](./skills/dashboard-ui/SKILL.md) |
@@ -22,13 +21,6 @@ Run this when you only want OliverSpec:
 
 ```bash
 npx skills add chroline/oliver/skills/oliverspec
-```
-
-Run these when you want Factory's single-ticket pipeline and its automatic PR follow-through:
-
-```bash
-npx skills add chroline/oliver/skills/factory
-npx skills add chroline/oliver/skills/babysit
 ```
 
 Run this when PRs already exist and you only need CI/review fixes through merge:
@@ -79,9 +71,7 @@ skills/
     oliverspec-apply/
     oliverspec-babysit/
     oliverspec-ship/
-  factory/             ← standalone: npx skills add chroline/oliver/skills/factory
-    README.md
-    SKILL.md
+    oliverspec-factory/
   babysit/             ← standalone: npx skills add chroline/oliver/skills/babysit
     README.md
     SKILL.md
