@@ -4,21 +4,15 @@
   "groupings": [
     {
       "title": "OliverSpec",
-      "description": "Linear-backed explore → propose → scope → apply → babysit → ship. Install as a suite: npx skills add chroline/oliver/skills/oliverspec",
+      "description": "Linear-backed explore → propose → scope → apply → babysit → ship, plus oliverspec-factory for single-ticket runs. Install as a suite: npx skills add chroline/oliver/skills/oliverspec",
       "skills": [
         "oliverspec-explore",
         "oliverspec-propose",
         "oliverspec-scope",
         "oliverspec-apply",
         "oliverspec-babysit",
-        "oliverspec-ship"
-      ]
-    },
-    {
-      "title": "Factory",
-      "description": "Autonomous single Linear-ticket factory: plan → critique → implement → stack, then invoke Babysit. Install: npx skills add chroline/oliver/skills/factory",
-      "skills": [
-        "factory"
+        "oliverspec-ship",
+        "oliverspec-factory"
       ]
     },
     {
@@ -40,6 +34,13 @@
       "description": "Build compact, functional shadcn dashboards with layouts, charts, tables, and navigation suited to any domain. Install: npx skills add chroline/oliver/skills/dashboard-ui",
       "skills": [
         "dashboard-ui"
+      ]
+    },
+    {
+      "title": "UI Audit",
+      "description": "Audit and polish an existing UI with rendered inspection and regression checks. Install: npx skills add chroline/oliver/skills/ui-audit",
+      "skills": [
+        "ui-audit"
       ]
     }
   ]

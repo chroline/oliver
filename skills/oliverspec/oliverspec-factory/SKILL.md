@@ -12,7 +12,7 @@ disable-model-invocation: true
 license: MIT
 metadata:
   author: chroline
-  version: "2.0"
+  version: "2.1"
 ---
 
 Run **one Linear ticket or one user request** end-to-end as an autonomous software factory.
@@ -61,7 +61,8 @@ Record the choices in `meta.json`. Pass the model explicitly on every sub-agent 
   impl-critique-N.md
   review-N.md       # code review findings + how each was addressed
   meta.json         # models, ticket url, branch, PR number, status
-  screenshots/      # Storybook captures for frontend changes
+  proof/e2e.md      # end-to-end proof log: commands, expected vs actual, pass/fail
+  screenshots/      # all UI media: png/webp screenshots and/or mp4/webm recordings
 ```
 
 Worktree root **outside** the repo: `../.factory-worktrees/<ID>/`.
@@ -76,7 +77,7 @@ Never commit factory artifacts into the git repo.
 
 ```bash
 gh auth status
-mkdir -p "/tmp/oliverspec-factory/<ID>"
+mkdir -p "/tmp/oliverspec-factory/<ID>/proof" "/tmp/oliverspec-factory/<ID>/screenshots"
 ```
 
 - Read the repo's agent instructions (`AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, or equivalent). Note its rules for tickets, branches, code review, PRs, and merging. Repo rules override this skill where they conflict.
@@ -118,6 +119,7 @@ Launch a sub-agent on the **planner** model. Its prompt includes:
 - A Mermaid diagram when the change touches more than one module
 - Test-first order: failing tests → typecheck-clean stubs → implement to green
 - Test commands
+- **E2E proof approach**: the commands, environment, and expected outcomes that prove the change works end to end (for `proof/e2e.md`), and which UI flows to capture in `screenshots/`
 - Storybook stories and states for any UI change
 - Rollout, migration, or feature-flag notes, or `n/a`
 - Risks and out-of-scope items
@@ -131,7 +133,7 @@ Repeat until the critic returns **APPROVED** or 3 rounds complete:
    - Every decision in `decisions.md` is applied as written.
    - Anything in the plan that the requirements did not ask for (over-scope)
    - Wrong assumptions about the code, unexecutable tasks (no path, vague "implement X"), ordering problems
-   - Test-plan holes, missing Storybook coverage for UI, missing rollout notes
+   - Test-plan and e2e-proof holes, missing Storybook coverage for UI, missing rollout notes
    - Any design question the plan answers on its own that `decisions.md` does not cover
    - Verdict: `APPROVED` or `REVISE` with a numbered list. It must not ask for more prose.
    - It writes `plan-critique-<N>.md`.
@@ -154,9 +156,13 @@ Launch a sub-agent on the **implementer** model. Contract:
 
 - Work only in that worktree
 - Follow `plan.md`, `requirements.md`, and `decisions.md`; work test-first
-- Frontend changes: add or update Storybook stories for every changed component and state, run Storybook, and save screenshots to `screenshots/`
+- **Prove it end to end (mandatory):** after tests pass, run the plan's e2e proof approach against the real running code. Write `proof/e2e.md`: what you ran, expected vs actual, pass/fail.
+- **Frontend changes (mandatory when applicable):**
+  1. Add or update Storybook stories for every changed component and state, and run Storybook
+  2. Capture screenshots and/or a short screen recording (default + key variants; empty/loading/error if touched). Prefer a recording for interactive flows
+  3. Save all UI media under `screenshots/` with stable names (`button-default.png`, `checkout-flow.mp4`), never under `proof/`
 - Commit on the branch. Do not open a PR.
-- Return files changed, test results, and residual risks
+- Return files changed, test results, the proof path, screenshot/recording paths, and residual risks
 
 ### 5. Implementation critique loop
 
@@ -167,10 +173,13 @@ Repeat until the critic returns **APPROVED** or 3 rounds complete:
    - Each decision applied as written
    - Behavior or files the plan did not call for
    - Tests that exist but do not prove the requirement, and commands that do not pass (it runs them)
+   - `proof/e2e.md` missing, failing, or not actually exercising the change end to end; UI diffs with nothing in `screenshots/`
    - Verdict: `APPROVED` or `REVISE` with a numbered list
    - It writes `impl-critique-<N>.md`.
 2. If `REVISE`: send the list to the implementer (same model, same worktree) to fix and commit.
 3. If round 3 is still `REVISE`: show the human the remaining items and ask how to proceed.
+
+**Proof gate (parent):** before moving on, read `proof/e2e.md` yourself. It must exist and pass. If the diff touches UI, `screenshots/` must hold at least one file. Otherwise send the implementer back.
 
 ### 6. Code review loop
 
@@ -185,12 +194,13 @@ Loop:
 
 ### 7. Open the PR
 
-Only after the code review loop is clean:
+Only after the code review loop is clean and the proof gate still passes (re-run the proof if review fixes changed behavior):
 
-- Push the branch and open one PR with `gh pr create`, following the repo's title and body rules.
+- Push the branch and open one **ready** PR with `gh pr create`, without `--draft`, following the repo's title and body rules.
+- Confirm it is not a draft: `gh pr view <PR> --json isDraft`. If it is, run `gh pr ready <PR>`. Do not start the CI loop on a draft.
 - Default title: `<ID>: <short title>`.
-- Default body: Summary, Linear link (`Fixes <ID>`), acceptance criteria checklist, test plan, and screenshots for any UI change (embedded so they render). Add any sections the repo requires.
-- Linear ticket: link the PR and upload the screenshots to an issue comment as attachments (not GitHub links).
+- Default body: Summary, Linear link (`Fixes <ID>`), acceptance criteria checklist, test plan, **E2E proof** (summary of `proof/e2e.md`: commands and result), and **Screenshots / recordings** for any UI change (embedded so they render, each captioned with story or flow + state). Add any sections the repo requires.
+- Linear ticket: link the PR and upload the same screenshots/recordings to an issue comment as attachments (not GitHub links).
 - `meta.json` → PR number, `status: "pr_open"`.
 
 ### 8. CI loop
@@ -223,10 +233,10 @@ With `skip-merge`, stop after step 8 and report the PR as ready.
 
 | Actor | Does |
 |-------|------|
-| **Parent** | Preflight, questions to the human, model routing, every loop, worktree lifecycle, Linear updates, PR creation, CI watching, merge |
+| **Parent** | Preflight, questions to the human, model routing, every loop, proof gate, worktree lifecycle, Linear updates, PR creation, CI watching, merge |
 | **Planner** | Repo exploration and `plan.md` revisions |
 | **Plan critic** | `plan-critique-N.md` only |
-| **Implementer** | Code, tests, commits, and fixes from critiques, reviews, and CI |
+| **Implementer** | Code, tests, `proof/e2e.md`, UI media, commits, and fixes from critiques, reviews, and CI |
 | **Implementation critic** | `impl-critique-N.md` only; runs tests, edits nothing |
 | **Code reviewer** | Findings only; edits nothing |
 
@@ -237,9 +247,11 @@ With `skip-merge`, stop after step 8 and report the PR as ready.
 - **One ticket or request per run.** Do not expand it into new tickets unless the human asks.
 - **The human makes every design decision.** Ask all open questions before the plan loop; stop and ask if a new one appears later.
 - **Critics compare against the source.** The plan critic checks the original requirements; the implementation critic checks the plan's requirements.
-- **Order is fixed:** questions → plan loop → implement → implementation loop → code review loop → PR → CI loop → merge. No PR before the review is clean.
+- **Order is fixed:** questions → plan loop → implement → implementation loop → proof gate → code review loop → PR → CI loop → merge. No PR before the review is clean.
 - **Test-first:** failing tests and typecheck-clean stubs, then implement to green.
-- **Frontend ⇒ Storybook + screenshots**, in the PR body and uploaded to the Linear ticket.
+- **Prove it end to end before the PR.** `proof/e2e.md` must exist and pass.
+- **Ready PRs only.** Never open a draft or watch CI on one.
+- **Frontend ⇒ Storybook + screenshots and/or recordings**, in the PR body and uploaded to the Linear ticket.
 - **Repo rules win** over this skill where they conflict.
 - **Never bypass CI or branch protection** to merge.
 - Factory files stay under `/tmp/oliverspec-factory/...` and `../.factory-worktrees/...`.
