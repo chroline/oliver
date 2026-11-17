@@ -25,7 +25,7 @@ npx skills add chroline/oliver/skills/babysit
 6. Stops when mergeable and asks for your explicit approval
 7. Re-checks, merges bottom-up, and moves the Linear issue to Done
 
-Factory invokes this skill after it opens PRs, but you can also run `/babysit <ISSUE-ID>` directly for an existing ticket.
+Run `/babysit <ISSUE-ID>` for an existing ticket with open PRs.
 
 ## What you need
 
@@ -35,5 +35,5 @@ Factory invokes this skill after it opens PRs, but you can also run `/babysit <I
 
 ## Related
 
-- Single-ticket planning and implementation: [Factory](../factory/README.md)
+- Single-ticket planning through merge: [OliverSpec Factory](../oliverspec/oliverspec-factory/README.md)
 - Full project workflow: [OliverSpec](../oliverspec/README.md)

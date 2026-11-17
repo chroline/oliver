@@ -12,8 +12,9 @@
 
 ## 1. Requirements & Constraints
 
-- **REQ-001**: ...
+- **REQ-001**: ... (cites `AC-n` / request text)
 - **CON-001**: ...
+- **DEC-001**: <human decision from decisions.md, applied as written>
 
 ## 2. Implementation
 
@@ -36,29 +37,20 @@ TDD: tests first → typecheck-clean stubs → implement to green.
 |------|-------------|-----------|
 | TASK-003 | ... | |
 
-## 3. Alternatives
+## 3. Testing
 
-- **ALT-001**: <rejected approach> — <why, one clause>
-
-## 4. Testing
-
-- **TEST-001**: <what to prove> — `command`
+- **TEST-001**: <what to prove; which REQ/AC> — `command`
 - Storybook: <story id + states to capture> (or `n/a — no UI`)
 
-## 5. Rollout
+## 4. Rollout
 
 - Migration / feature-flag / rollout notes, or `n/a`
 
-## 6. Risks & Assumptions
+## 5. Risks & Assumptions
 
 - **RISK-001**: ...
-- **ASSUMPTION-001**: ...
-- Open questions: ...
+- **ASSUMPTION-001**: <fact about the code, verified> — never a design choice; those belong in decisions.md
 - Out of scope: ...
-
-## 7. PR split
-
-- 1/1 — <intent>   (or stacked layers: tests/types → core → wiring)
 
 ## Dependencies
 
