@@ -28,10 +28,10 @@ npx skills add chroline/oliver/skills/oliverspec
 3. Planner (Opus or Sol, else the smartest model) writes a concise `plan.md`
 4. A fresh critic checks the plan against the original requirements; loop until approved
 5. Posts the plan on the ticket
-6. Implementer (Sonnet or Terra, else the smartest model) builds it test-first in a worktree
+6. Implementer (Sonnet or Terra, else the smartest model) builds it test-first in a worktree and proves it end to end (`proof/e2e.md`; screenshots or a recording for UI)
 7. A critic on the implementer's model checks the implementation against the plan; loop until approved
 8. Runs the repo's code review process (or a code-review agent) until there are no blockers
-9. Opens the PR, waits for CI, fixes failures until green
+9. Opens a ready (non-draft) PR, waits for CI, fixes failures until green
 10. Merges and moves the ticket to Done
 
 ## What you need

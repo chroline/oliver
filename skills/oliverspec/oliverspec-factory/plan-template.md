@@ -40,7 +40,8 @@ TDD: tests first → typecheck-clean stubs → implement to green.
 ## 3. Testing
 
 - **TEST-001**: <what to prove; which REQ/AC> — `command`
-- Storybook: <story id + states to capture> (or `n/a — no UI`)
+- **E2E proof**: <commands/environment> → <expected outcome> (written to `proof/e2e.md`)
+- Storybook: <story id + states to capture; flows to record> (or `n/a — no UI`)
 
 ## 4. Rollout
 
